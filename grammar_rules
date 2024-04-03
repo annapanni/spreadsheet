@@ -1,0 +1,8 @@
+expression     → factor ( ( "-" | "+" ) factor )* ;
+factor         → unary ( ( "/" | "*" ) unary )* ;
+unary          → "-" unary
+               | function
+               | primary;
+function       → STRING "(" cell ":" cell ")" ;
+cell           → STRING NUMBER
+primary        → NUMBER | "(" expression ")" | cell;
