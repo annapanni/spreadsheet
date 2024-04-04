@@ -113,54 +113,48 @@ public:
 
 FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end, size_t w = 0);
 
-class Operand : public Expression {
+class Operator : public Expression {
 protected:
 	Expression* lhs;
 	Expression* rhs;
 public:
-	Operand(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
+	Operator(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
+	Operator(const Operator& op) : lhs(op.lhs->copy()), rhs(op.rhs->copy()) {}
+	Operator& operator=(const Operator& op);
 	void checkCyclic(std::vector<Expression*> ps) {lhs->checkCyclic(ps); rhs->checkCyclic(ps);}
-	virtual ~Operand(){
+	virtual ~Operator(){
 		delete lhs;
 		delete rhs;
 	}
 };
 
-class Mult : public Operand {
+class Mult : public Operator {
 public:
-	Mult(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
-	Mult(const Mult& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
-	Mult& operator=(const Mult& op);
+	Mult(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() {return lhs->eval() * rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "*" + rhs->show() + ")";}
 	Expression* copy() const {return new Mult(lhs->copy(), rhs->copy());}
 };
 
-class Div : public Operand {
+class Div : public Operator {
 public:
-	Div(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
-	Div(const Div& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
-	Div& operator=(const Div& op);
+	Div(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() {return lhs->eval() / rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "/" + rhs->show() + ")";}
 	Expression* copy() const {return new Div(lhs->copy(), rhs->copy());}
 };
 
-class Add : public Operand {
+class Add : public Operator {
 public:
-	Add(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
-	Add(const Add& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
-	Add& operator=(const Add& op);
+	Add(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() {return lhs->eval() + rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "+" + rhs->show() + ")";}
 	Expression* copy() const {return new Add(lhs->copy(), rhs->copy());}
 };
 
-class Sub : public Operand {
+class Sub : public Operator {
 public:
-	Sub(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
-	Sub(const Sub& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
-	Sub& operator=(const Sub& op);
+	Sub(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() {return lhs->eval() - rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "-" + rhs->show() + ")";}
 	Expression* copy() const {return new Sub(lhs->copy(), rhs->copy());}

@@ -40,7 +40,7 @@ void Range::beginIter() {
 	ExprPointer* ep = end->getContent();
 	if (bp == NULL || ep == NULL)
 		throw "uninitialized cell reference in range\n";
-	rangeWidth = (ep - bp) % tableWidth;
+	rangeWidth = (ep - bp - 1) % (int)tableWidth + 1;
 	iterCell = bp - 1;
 	iterRow = bp;
 }
@@ -106,37 +106,7 @@ double SumFunc::eval() {
 	return sum;
 }
 
-Mult& Mult::operator=(const Mult& op){
-	if (&op != this) {
-		delete lhs;
-		lhs = op.lhs->copy();
-		delete rhs;
-		rhs = op.rhs->copy();
-	}
-	return *this;
-}
-
-Div& Div::operator=(const Div& op){
-	if (&op != this) {
-		delete lhs;
-		lhs = op.lhs->copy();
-		delete rhs;
-		rhs = op.rhs->copy();
-	}
-	return *this;
-}
-
-Add& Add::operator=(const Add& op){
-	if (&op != this) {
-		delete lhs;
-		lhs = op.lhs->copy();
-		delete rhs;
-		rhs = op.rhs->copy();
-	}
-	return *this;
-}
-
-Sub& Sub::operator=(const Sub& op){
+Operator& Operator::operator=(const Operator& op){
 	if (&op != this) {
 		delete lhs;
 		lhs = op.lhs->copy();

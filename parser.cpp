@@ -206,7 +206,7 @@ void Parser::parseTo(Sheet* shp, ExprPointer& ep){
 	}
 }
 
-Operand* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs){
+Operator* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs){
 	switch (tt) {
 		case PLUS:
 			return new Add(lhs, rhs);

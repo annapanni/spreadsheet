@@ -14,7 +14,7 @@ int main(void) {
 	delete e;
 
 
-	Sheet sh(std::vector<double>{1,2,3,4}, 2);
+	Sheet sh({1,2,3,4}, 2);
 
 	sh[0][0] = new NumberExpr(5);
 
@@ -31,7 +31,6 @@ int main(void) {
 		std::cout << "\nSomething went wrong with parsing\n";
 	}
 
-
 	sh.print();
 	sh[0][1] = Parser("b2").parse(&sh);
 
@@ -40,7 +39,7 @@ int main(void) {
 
 	sh.print();
 
-	Sheet sh2(std::vector<double>{1,2,3,4}, 4);
+	Sheet sh2({1,2,3,4}, 4);
 	sh2.print();
 
 	delete expr;
@@ -54,6 +53,10 @@ int main(void) {
 	} catch (const char* msg) {
 		std::cout << msg;
 	}
+
+	Mult m (new NumberExpr(1), new NumberExpr(5));
+	Mult k = m;
+	std::cout << k.show();
 
 	return 0;
 }

@@ -52,6 +52,6 @@ public:
 	}
 };
 
-Operand* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs);
+Operator* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs);
 
 #endif
