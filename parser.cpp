@@ -161,6 +161,7 @@ Expression* Parser::primary(Sheet* shp){
 	}
 	return NULL;
 }
+
 CellRefExpr* Parser::cell(Sheet* shp){
 	CellRefExpr* expr = NULL;
 	if(match(STRING)){
@@ -180,8 +181,8 @@ CellRefExpr* Parser::cell(Sheet* shp){
 					return new CellRefExpr(col, row, (*shp)[row-1] + cn-1);
 			}
 			return new CellRefExpr(col, row);
-		} catch (const std::bad_cast& bc) {
-		} catch (const std::invalid_argument& ia) {}
+		} catch (const std::bad_cast& bc) { throw "tokenization error\n";
+		} catch (const std::invalid_argument& ia) {throw "invalid cell\n";}
 	}
 	return expr;
 }
