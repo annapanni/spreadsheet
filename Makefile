@@ -4,7 +4,7 @@ CXXFLAGS = -Werror -Wall -Wextra -Wpedantic -Wconversion -fsanitize=address
 SRCS = token.cpp expression.cpp sheet.cpp parser.cpp
 OBJS = $(SRCS:.cpp=.o)
 
-SRCS1 = main.cpp
+SRCS1 = test.cpp
 OBJS1 = $(OBJS) $(SRCS1:.cpp=.o)
 PROG1 = test
 

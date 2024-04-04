@@ -7,7 +7,7 @@
 
 class Expression {
 public:
-	virtual double eval() const = 0;
+	virtual double eval() = 0;
 	virtual std::string show() const = 0;
 	virtual Expression* copy() const = 0;
 	virtual ~Expression() {};
@@ -34,7 +34,7 @@ class NumberExpr : public Expression {
 	double value;
 public:
 	NumberExpr(double v) : value(v) {}
-	double eval() const {return value;}
+	double eval() {return value;}
 	Expression* copy() const {return new NumberExpr(value);}
 	std::string show() const {std::ostringstream ss; ss << value; return ss.str();}
 };
@@ -47,9 +47,31 @@ public:
 	CellRefExpr(std::string col, int row) : col(col), row(row) {}
 	CellRefExpr(std::string col, int row, ExprPointer* e) : col(col), row(row), content(e) {}
 	ExprPointer* getContent() const {return content;}
-	double eval() const;
+	double eval();
 	std::string show() const {return col + std::to_string(row);}
 	CellRefExpr* copy() const {return new CellRefExpr(col, row, content);}
+};
+
+class Range {
+	CellRefExpr* begin;
+	CellRefExpr* end;
+	size_t tableWidth = 0;
+	//initialized by beginIter:
+	size_t rangeWidth;
+	ExprPointer* iterRow;
+	ExprPointer* iterCell;
+public:
+	Range(CellRefExpr* begin, CellRefExpr* end) : begin(begin), end(end) {}
+	Range(CellRefExpr* begin, CellRefExpr* end, size_t w) : begin(begin), end(end), tableWidth(w) {}
+	Range(const Range& r) : begin(r.begin->copy()), end(r.end->copy()), tableWidth(r.tableWidth) {}
+	Range& operator=(const Range& r);
+	void beginIter();
+	ExprPointer* next();
+	std::string show() const {return begin->show() + ":" + end->show();}
+	~Range(){
+		delete begin;
+		delete end;
+	}
 };
 
 enum FunctionName {
@@ -58,39 +80,37 @@ enum FunctionName {
 
 class FunctionExpr : public Expression {
 protected:
-	CellRefExpr* begin;
-	CellRefExpr* end;
-	size_t tableWidth = 0;
+	Range range;
 public:
-	FunctionExpr(CellRefExpr* begin, CellRefExpr* end) : begin(begin), end(end) {}
-	FunctionExpr(CellRefExpr* begin, CellRefExpr* end, size_t w) : begin(begin), end(end), tableWidth(w) {}
+	FunctionExpr(Range r) : range(r) {}
+	FunctionExpr(CellRefExpr* begin, CellRefExpr* end) : range(begin, end) {}
+	FunctionExpr(CellRefExpr* begin, CellRefExpr* end, size_t w) : range(begin, end, w) {}
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
 		return INVALID;
 	}
-	virtual ~FunctionExpr(){
-		delete begin;
-		delete end;
-	}
+	virtual ~FunctionExpr(){}
 };
 
 class AvgFunc : public FunctionExpr {
 public:
+	AvgFunc(Range r) : FunctionExpr(r) {}
 	AvgFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
 	AvgFunc(CellRefExpr* begin, CellRefExpr* end, size_t w) : FunctionExpr(begin, end, w) {}
-	double eval() const;
-	std::string show() const {return "avg(" + begin->show() + ":" + end->show() + ")";}
-	Expression* copy() const {return new AvgFunc(begin->copy(), end->copy(), tableWidth);}
+	double eval();
+	std::string show() const {return "avg(" + range.show() + ")";}
+	Expression* copy() const {return new AvgFunc(range);}
 };
 
 class SumFunc : public FunctionExpr {
 public:
+	SumFunc(Range r) : FunctionExpr(r) {}
 	SumFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
 	SumFunc(CellRefExpr* begin, CellRefExpr* end, size_t w) : FunctionExpr(begin, end, w) {}
-	double eval() const;
-	std::string show() const {return "sum(" + begin->show() + ":" +	end->show() + ")";}
-	Expression* copy() const {return new SumFunc(begin->copy(), end->copy(), tableWidth);}
+	double eval();
+	std::string show() const {return "sum(" + range.show() + ")";}
+	Expression* copy() const {return new SumFunc(range);}
 };
 
 FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end, size_t w = 0);
@@ -112,7 +132,7 @@ public:
 	Mult(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
 	Mult(const Mult& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
 	Mult& operator=(const Mult& op);
-	double eval() const {return lhs->eval() * rhs->eval();}
+	double eval() {return lhs->eval() * rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "*" + rhs->show() + ")";}
 	Expression* copy() const {return new Mult(lhs->copy(), rhs->copy());}
 };
@@ -122,7 +142,7 @@ public:
 	Div(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
 	Div(const Div& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
 	Div& operator=(const Div& op);
-	double eval() const {return lhs->eval() / rhs->eval();}
+	double eval() {return lhs->eval() / rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "/" + rhs->show() + ")";}
 	Expression* copy() const {return new Div(lhs->copy(), rhs->copy());}
 };
@@ -132,7 +152,7 @@ public:
 	Add(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
 	Add(const Add& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
 	Add& operator=(const Add& op);
-	double eval() const {return lhs->eval() + rhs->eval();}
+	double eval() {return lhs->eval() + rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "+" + rhs->show() + ")";}
 	Expression* copy() const {return new Add(lhs->copy(), rhs->copy());}
 };
@@ -142,7 +162,7 @@ public:
 	Sub(Expression* lhs, Expression* rhs) : Operand(lhs, rhs) {}
 	Sub(const Sub& op) : Operand (op.lhs->copy(), op.rhs->copy()){}
 	Sub& operator=(const Sub& op);
-	double eval() const {return lhs->eval() - rhs->eval();}
+	double eval() {return lhs->eval() - rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "-" + rhs->show() + ")";}
 	Expression* copy() const {return new Sub(lhs->copy(), rhs->copy());}
 };
