@@ -56,6 +56,22 @@ std::string Sheet::colLetter(size_t n) const {
 	return col;
 }
 
+void Sheet::copyTo(Sheet& sh) const {
+	size_t minw = sh.width < width ? sh.width : width;
+	size_t minh = sh.height < height ? sh.height : height;
+	for (size_t row = 0; row < minh; row++){
+		for (size_t col = 0; col < minw; col++){
+			sh[row][col] = table[row*width + col]->copy();
+		}
+	}
+}
+
+void Sheet::resize(size_t w, size_t h, double fill){
+	Sheet sh = Sheet(w, h, fill);
+	copyTo(sh);
+	*this = sh;
+}
+
 void Sheet::print() const {
 	if (height == 0 || width == 0) {
 		std::cout << "Sheet doesn't exists" << std::endl;

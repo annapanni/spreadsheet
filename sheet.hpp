@@ -29,6 +29,9 @@ public:
 	bool checkRow(size_t r) const {return r <= height && r > 0;}
 	bool checkCol(size_t col) const {return col <= width && col > 0;}
 
+	void copyTo(Sheet& sh) const;
+	void resize(size_t w, size_t h, double fill = 0);
+
 	void print() const;
 
 	~Sheet(){delete[] table;}
