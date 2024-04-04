@@ -44,5 +44,16 @@ int main(void) {
 	sh2.print();
 
 	delete expr;
+
+
+	std::cout << "\n -------- \n";
+	Sheet sheet(5, 5, 1);
+	Parser("a1").parseTo(&sheet, sheet[0][0]);
+	try {
+		sheet[0][0]->checkCyclic({*(sheet[0][0])});
+	} catch (const char* msg) {
+		std::cout << msg;
+	}
+
 	return 0;
 }

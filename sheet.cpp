@@ -86,7 +86,7 @@ void Sheet::print() const {
 		std::cout << std::setw((int)std::log10(height)+1) << row+1 << "|";
 		for (size_t col = 0; col < width; col++) {
 			try {
-				std::cout << table[row*width + col]->eval() << "\t";
+				std::cout << table[row*width + col].evalMe() << "\t";
 			} catch (const char* msg){
 				std::cout << "#ERR" << "\t";
 			}

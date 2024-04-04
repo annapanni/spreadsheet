@@ -39,7 +39,7 @@ int main(void) {
 			if (sh.checkRow(r+1) && sh.checkCol(c+1)){
 				std::cout << sh[r][c]->show() << " = ";
 				try	{
-					std::cout << sh[r][c]->eval() << '\n';
+					std::cout << sh[r][c].evalMe() << '\n';
 				} catch (const char* msg) {
 					std::cout << msg;
 				}

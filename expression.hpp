@@ -4,10 +4,13 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <vector>
 
 class Expression {
 public:
 	virtual double eval() = 0;
+	virtual void checkCyclic(std::vector<Expression*>) = 0;
+	virtual double safeEval(std::vector<Expression*> ps) {checkCyclic(ps); return eval();}
 	virtual std::string show() const = 0;
 	virtual Expression* copy() const = 0;
 	virtual ~Expression() {};
@@ -18,9 +21,11 @@ class ExprPointer {
 public:
 	ExprPointer(Expression* p = NULL) : ep(p) {}
 	ExprPointer(const ExprPointer& rhs) : ep(rhs.ep->copy()) {}
-	Expression* getPtr() const {return ep;}
+	Expression* operator*() const {return ep;}
 	ExprPointer& operator=(const ExprPointer& rhs);
 	Expression* operator->() const {return ep;}
+	bool operator==(Expression* p) {return ep == p;}
+	double evalMe() {return ep->safeEval({ep});}
 	~ExprPointer() {delete ep;}
 };
 
@@ -29,6 +34,7 @@ class NumberExpr : public Expression {
 public:
 	NumberExpr(double v) : value(v) {}
 	double eval() {return value;}
+	void checkCyclic(std::vector<Expression*>) {}
 	Expression* copy() const {return new NumberExpr(value);}
 	std::string show() const {std::ostringstream ss; ss << value; return ss.str();}
 };
@@ -42,6 +48,7 @@ public:
 	CellRefExpr(std::string col, int row, ExprPointer* e) : col(col), row(row), content(e) {}
 	ExprPointer* getContent() const {return content;}
 	double eval();
+	void checkCyclic(std::vector<Expression*>);
 	std::string show() const {return col + std::to_string(row);}
 	CellRefExpr* copy() const {return new CellRefExpr(col, row, content);}
 };
@@ -77,6 +84,7 @@ protected:
 public:
 	FunctionExpr(Range r) : range(r) {}
 	FunctionExpr(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : range(begin, end, w) {}
+	void checkCyclic(std::vector<Expression*>);
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
@@ -111,6 +119,7 @@ protected:
 	Expression* rhs;
 public:
 	Operand(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
+	void checkCyclic(std::vector<Expression*> ps) {lhs->checkCyclic(ps); rhs->checkCyclic(ps);}
 	virtual ~Operand(){
 		delete lhs;
 		delete rhs;

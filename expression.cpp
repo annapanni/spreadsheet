@@ -14,19 +14,15 @@ double CellRefExpr::eval() {
 	return (*content)->eval();
 }
 
-
-/*
-ExprPointer* bp = begin->getContent();
-ExprPointer* ep = end->getContent();
-if (bp == NULL || ep == NULL)
-	throw "uninitialized cell reference in range\n";
-size_t rangeWidth = (ep - bp) % tableWidth;
-double sum = 0;
-for (ExprPointer* row = bp; row <= ep-rangeWidth; row += tableWidth){
-	for (ExprPointer* cell = row; cell <= row+rangeWidth; cell++){
-		sum += (*cell)->eval();
+void CellRefExpr::checkCyclic(std::vector<Expression*> ps){
+	for (Expression* expP : ps) {
+		if (*content == expP) {
+			throw "cyclic reference\n";
+		}
 	}
-}*/
+	ps.push_back(**content);
+	(*content)->checkCyclic(ps);
+}
 
 Range& Range::operator=(const Range& r){
 	if (&r != this){
@@ -59,6 +55,21 @@ ExprPointer* Range::next(){
 		return iterCell;
 	} else {
 		return NULL;//end of iteration
+	}
+}
+
+void FunctionExpr::checkCyclic(std::vector<Expression*> ps) {
+	range.beginIter();
+	ExprPointer* cell;
+	while ((cell = range.next())) {
+		for (Expression* exprP : ps) {
+			if (*cell ==  exprP) {
+				throw "cyclic reference\n";
+			}
+		}
+		ps.push_back(**cell);
+		(*cell)->checkCyclic(ps);
+		ps.pop_back();
 	}
 }
 
