@@ -19,13 +19,7 @@ public:
 	ExprPointer(Expression* p = NULL) : ep(p) {}
 	ExprPointer(const ExprPointer& rhs) : ep(rhs.ep->copy()) {}
 	Expression* getPtr() const {return ep;}
-	ExprPointer& operator=(const ExprPointer& rhs) {
-		if (&rhs != this) {
-			delete ep;
-			ep = rhs.ep->copy();
-		}
-		return *this;
-	}
+	ExprPointer& operator=(const ExprPointer& rhs);
 	Expression* operator->() const {return ep;}
 	~ExprPointer() {delete ep;}
 };
@@ -61,8 +55,7 @@ class Range {
 	ExprPointer* iterRow;
 	ExprPointer* iterCell;
 public:
-	Range(CellRefExpr* begin, CellRefExpr* end) : begin(begin), end(end) {}
-	Range(CellRefExpr* begin, CellRefExpr* end, size_t w) : begin(begin), end(end), tableWidth(w) {}
+	Range(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : begin(begin), end(end), tableWidth(w) {}
 	Range(const Range& r) : begin(r.begin->copy()), end(r.end->copy()), tableWidth(r.tableWidth) {}
 	Range& operator=(const Range& r);
 	void beginIter();
@@ -83,8 +76,7 @@ protected:
 	Range range;
 public:
 	FunctionExpr(Range r) : range(r) {}
-	FunctionExpr(CellRefExpr* begin, CellRefExpr* end) : range(begin, end) {}
-	FunctionExpr(CellRefExpr* begin, CellRefExpr* end, size_t w) : range(begin, end, w) {}
+	FunctionExpr(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : range(begin, end, w) {}
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
@@ -96,8 +88,7 @@ public:
 class AvgFunc : public FunctionExpr {
 public:
 	AvgFunc(Range r) : FunctionExpr(r) {}
-	AvgFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
-	AvgFunc(CellRefExpr* begin, CellRefExpr* end, size_t w) : FunctionExpr(begin, end, w) {}
+	AvgFunc(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : FunctionExpr(begin, end, w) {}
 	double eval();
 	std::string show() const {return "avg(" + range.show() + ")";}
 	Expression* copy() const {return new AvgFunc(range);}
@@ -106,8 +97,7 @@ public:
 class SumFunc : public FunctionExpr {
 public:
 	SumFunc(Range r) : FunctionExpr(r) {}
-	SumFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
-	SumFunc(CellRefExpr* begin, CellRefExpr* end, size_t w) : FunctionExpr(begin, end, w) {}
+	SumFunc(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : FunctionExpr(begin, end, w) {}
 	double eval();
 	std::string show() const {return "sum(" + range.show() + ")";}
 	Expression* copy() const {return new SumFunc(range);}

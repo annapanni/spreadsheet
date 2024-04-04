@@ -15,7 +15,6 @@ int main(void) {
 
 
 	Sheet sh(std::vector<double>{1,2,3,4}, 2);
-	std::cout << sh.getWidth() << " " << sh.getHeight() << std::endl;
 
 	sh[0][0] = new NumberExpr(5);
 

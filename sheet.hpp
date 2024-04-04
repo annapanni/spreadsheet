@@ -12,19 +12,13 @@ class Sheet {
 	size_t width;
 	size_t height;
 public:
+	Sheet() : table(NULL), width(0), height(0) {}
 	Sheet(const Sheet&);
-	Sheet(ExprPointer* t=NULL, size_t w=0, size_t h=0) : table(t), width(w), height(h) {}
-	Sheet(size_t w, size_t h);
+	Sheet(size_t w, size_t h, double fill = 0);
 	Sheet(std::vector<double> vec, size_t w);
 	size_t getWidth() const {return width;}
-	size_t getHeight() const {return height;}
+	size_t getHeight() const {return height;} // unused
 	Sheet& operator=(const Sheet&);
-	/*
-	const Expression** operator[](size_t i)const {
-		if (i < height)
-			return table + i*width;
-		throw "index out of range\n";
-	}*/
 	ExprPointer* operator[](size_t i) {
 		if (i < height)
 			return table + i*width;
@@ -37,9 +31,7 @@ public:
 
 	void print() const;
 
-	~Sheet(){
-		delete[] table;
-	}
+	~Sheet(){delete[] table;}
 };
 
 

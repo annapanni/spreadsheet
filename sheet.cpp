@@ -10,10 +10,10 @@ Sheet::Sheet(const Sheet& sh): width(sh.width), height(sh.height){
 	}
 }
 
-Sheet::Sheet(size_t w, size_t h) : width(w), height(h){
+Sheet::Sheet(size_t w, size_t h, double fill) : width(w), height(h){
 	table = new ExprPointer[width * height];
 	for (size_t i = 0; i < width*height; i++) {
-		table[i] = new NumberExpr(0);
+		table[i] = new NumberExpr(fill);
 	}
 }
 

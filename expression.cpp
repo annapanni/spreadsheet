@@ -1,5 +1,13 @@
 #include "expression.hpp"
 
+ExprPointer& ExprPointer::operator=(const ExprPointer& rhs) {
+	if (&rhs != this) {
+		delete ep;
+		ep = rhs.ep->copy();
+	}
+	return *this;
+}
+
 double CellRefExpr::eval() {
 	if (content == NULL)
 		throw "uninitialized cell reference / cell reference out of bound\n";
