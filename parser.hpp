@@ -35,6 +35,7 @@ public:
 	void addTokenFromStr(std::string& str_buffer);
 
 	Expression* parse(Sheet* shp = NULL);
+	void parseTo(Sheet* shp, ExprPointer& ep);
 
 	void show(){
 		for (Token*& t : tokens) {

@@ -6,3 +6,8 @@ unary          → "-" unary
 function       → STRING "(" cell ":" cell ")" ;
 cell           → STRING NUMBER
 primary        → NUMBER | "(" expression ")" | cell;
+
+
+References:
+https://www2.lawrence.edu/fast/GREGGJ/CMSC270/parser/parser.html
+https://craftinginterpreters.com

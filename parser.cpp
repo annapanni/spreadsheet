@@ -17,7 +17,7 @@ void Parser::addTokenFromStr(std::string& str_buffer){
 			size_t pos;
 			double d = std::stod(str_buffer, &pos);
 			if (pos < str_buffer.size()) {
-				throw "couldn't convert entire number";
+				throw "couldn't convert entire number\n";
 			}
 			addToken(d);
 		} catch (const std::invalid_argument& ia){
@@ -63,7 +63,7 @@ Token* Parser::consume(Token_type tt, const char* msg){
 Expression* Parser::expression(Sheet* shp){
 	Expression* expr = factor(shp);
 	if (expr == NULL)
-		throw "not enough arguments (+-)";
+		throw "not enough arguments (+-)\n";
 	while (match(MINUS) || match(PLUS)){
 		Token_type operand = prev()->getType();
 		Expression* rhs;
@@ -75,7 +75,7 @@ Expression* Parser::expression(Sheet* shp){
 		}
 		if (rhs == NULL){
 			delete expr;
-			throw "not enough arguments (+-)";
+			throw "not enough arguments (+-)\n";
 		}
 		expr = operandFromToken(operand, expr, rhs);
 	}
@@ -84,7 +84,7 @@ Expression* Parser::expression(Sheet* shp){
 Expression* Parser::factor(Sheet* shp){
 	Expression* expr = unary(shp);
 	if (expr == NULL)
-		throw "not enough arguments (*/)";
+		throw "not enough arguments (*/)\n";
 	while (match(SLASH) || match(STAR)){
 		Token_type operand = prev()->getType();
 		Expression* rhs;
@@ -120,11 +120,11 @@ Expression* Parser::function(Sheet* shp){
 		FunctionName fname = FunctionExpr::parseFname(fstr);
 		if (match(LEFT_BR)) {
 			if (fname == INVALID)
-				throw "invalid function name";
+				throw "invalid function name\n";
 			CellRefExpr* c1 = cell(shp);
-			consume(COLON, "invalid range in function");
+			consume(COLON, "invalid range in function\n");
 			CellRefExpr* c2 = cell(shp);
-			consume(RIGHT_BR, "mismatched brackets");
+			consume(RIGHT_BR, "mismatched brackets\n");
 			if (c1!=NULL && c2!=NULL) {
 				if (shp)
 					return newFunctionExpr(fname, c1, c2, shp->getWidth());
@@ -145,12 +145,12 @@ Expression* Parser::primary(Sheet* shp){
 			DataToken<double>* nt = dynamic_cast<DataToken<double>*>(prev());
 			return new NumberExpr(nt->getContent());
 		} catch (const std::bad_cast& bc){
-			throw "invalid number";
+			throw "invalid number\n";
 		}
 	} else if (match(LEFT_BR)){
 		expr = expression(shp);
 		try {
-			consume(RIGHT_BR, "mismatched brackets");
+			consume(RIGHT_BR, "mismatched brackets\n");
 		} catch (const char* msg){
 			delete expr;
 			throw msg;
@@ -173,11 +173,11 @@ CellRefExpr* Parser::cell(Sheet* shp){
 			std::string numstr = cellstr.substr(i, cellstr.size()-i);
 			int row = stoi(numstr, &pos);
 			if (pos < numstr.size())
-				throw "invalid cell";
+				throw "invalid cell\n";
 			if (shp) {
 				size_t cn = shp->colNumber(col);
 				if (shp->checkRow(row) && shp->checkCol(cn))
-					return new CellRefExpr(col, row, &((*shp)[row-1][cn-1]));
+					return new CellRefExpr(col, row, (*shp)[row-1] + cn-1);
 			}
 			return new CellRefExpr(col, row);
 		} catch (const std::bad_cast& bc) {
@@ -199,6 +199,12 @@ Expression* Parser::parse(Sheet* shp){
 	return expr;
 }
 
+void Parser::parseTo(Sheet* shp, ExprPointer& ep){
+	Expression* expr = parse(shp);
+	if (expr) {
+		ep = expr;
+	}
+}
 
 Operand* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs){
 	switch (tt) {

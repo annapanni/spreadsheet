@@ -2,7 +2,7 @@
 
 double CellRefExpr::eval() const {
 	if (content == NULL)
-		throw "uninitialized cell reference / cell reference out of bound";
+		throw "uninitialized cell reference / cell reference out of bound\n";
 	return (*content)->eval();
 }
 
@@ -18,15 +18,15 @@ FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* 
 }
 
 double AvgFunc::eval() const {
-	Expression** bp = begin->getContent();
-	Expression** ep = end->getContent();
+	ExprPointer* bp = begin->getContent();
+	ExprPointer* ep = end->getContent();
 	if (bp == NULL || ep == NULL)
-		throw "uninitialized cell reference in range";
+		throw "uninitialized cell reference in range\n";
 	size_t db = 0;
 	double sum = 0;
 	//oszloponként járja be
-	for (Expression** colstart = bp; colstart + tableWidth <= ep; colstart++) {
-		for (Expression** cell = colstart ; cell <= ep; cell += tableWidth) {
+	for (ExprPointer* colstart = bp; colstart + tableWidth <= ep; colstart++) {
+		for (ExprPointer* cell = colstart ; cell <= ep; cell += tableWidth) {
 			sum += (*cell)->eval();
 			db++;
 		}
@@ -35,14 +35,14 @@ double AvgFunc::eval() const {
 }
 
 double SumFunc::eval() const {
-	if (begin->getContent() == NULL || end->getContent() == NULL)
-		throw "uninitialized cell reference in range";
-	Expression** bp = begin->getContent();
-	Expression** ep = end->getContent();
+	ExprPointer* bp = begin->getContent();
+	ExprPointer* ep = end->getContent();
+	if (bp == NULL || ep == NULL)
+		throw "uninitialized cell reference in range\n";
+	size_t rangeWidth = (ep - bp) % tableWidth;
 	double sum = 0;
-	//oszloponként járja be
-	for (Expression** colstart = bp; colstart + tableWidth <= ep; colstart++) {
-		for (Expression** cell = colstart ; cell <= ep; cell += tableWidth) {
+	for (ExprPointer* row = bp; row <= ep-rangeWidth; row += tableWidth){
+		for (ExprPointer* cell = row; cell <= row+rangeWidth; cell++){
 			sum += (*cell)->eval();
 		}
 	}
