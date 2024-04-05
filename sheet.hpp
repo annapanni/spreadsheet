@@ -5,7 +5,7 @@
 #include <vector>
 #include <math.h>
 
-#include "expression.hpp"
+#include "expression_core.hpp"
 
 class Sheet {
 	ExprPointer* table;
@@ -26,6 +26,7 @@ public:
 	}
 	size_t colNumber(std::string) const;
 	std::string colLetter (size_t) const;
+	ExprPointer* parseCell(std::string col, size_t row) const;
 	bool checkRow(size_t r) const {return r <= height && r > 0;}
 	bool checkCol(size_t col) const {return col <= width && col > 0;}
 

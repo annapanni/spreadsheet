@@ -2,70 +2,38 @@
 #define EXPRESSION_HPP
 
 #include <string>
-#include <sstream>
 #include <iostream>
 #include <vector>
 
-class Expression {
-public:
-	virtual double eval() = 0;
-	virtual void checkCyclic(std::vector<Expression*>) = 0;
-	virtual double safeEval(std::vector<Expression*> ps) {checkCyclic(ps); return eval();}
-	virtual std::string show() const = 0;
-	virtual Expression* copy() const = 0;
-	virtual ~Expression() {};
-};
-
-class ExprPointer {
-	Expression* ep;
-public:
-	ExprPointer(Expression* p = NULL) : ep(p) {}
-	ExprPointer(const ExprPointer& rhs) : ep(rhs.ep->copy()) {}
-	Expression* operator*() const {return ep;}
-	ExprPointer& operator=(const ExprPointer& rhs);
-	Expression* operator->() const {return ep;}
-	bool operator==(Expression* p) {return ep == p;}
-	double evalMe() {return ep->safeEval({ep});}
-	~ExprPointer() {delete ep;}
-};
-
-class NumberExpr : public Expression {
-	double value;
-public:
-	NumberExpr(double v) : value(v) {}
-	double eval() {return value;}
-	void checkCyclic(std::vector<Expression*>) {}
-	Expression* copy() const {return new NumberExpr(value);}
-	std::string show() const {std::ostringstream ss; ss << value; return ss.str();}
-};
+#include "expression_core.hpp"
+#include "sheet.hpp"
 
 class CellRefExpr : public Expression {
 	std::string col;
 	int row;
-	ExprPointer* content = NULL;
+	Sheet* sh;
 public:
-	CellRefExpr(std::string col, int row) : col(col), row(row) {}
-	CellRefExpr(std::string col, int row, ExprPointer* e) : col(col), row(row), content(e) {}
+	CellRefExpr(std::string col, int row, Sheet* sh = NULL) : col(col), row(row), sh(sh) {}
 	std::string getCol() const {return col;}
 	int getRow() const {return row;}
-	ExprPointer* getContent() const {return content;}
+	Sheet* getSheet() const {return sh;}
+	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(col, row);}
 	double eval();
 	void checkCyclic(std::vector<Expression*>);
 	std::string show() const {return col + std::to_string(row);}
-	CellRefExpr* copy() const {return new CellRefExpr(col, row, content);}
+	CellRefExpr* copy() const {return new CellRefExpr(col, row, sh);}
 };
 
 class Range {
 	CellRefExpr* begin;
-	CellRefExpr* end;
-	size_t tableWidth = 0;
+	CellRefExpr* end;		//exprected that begin and end are on the same sheet
 	//initialized by beginIter:
 	size_t rangeWidth;
 	ExprPointer* iterRow;
 	ExprPointer* iterCell;
 public:
-	Range(CellRefExpr* bg, CellRefExpr* ed, size_t w=0);
-	Range(const Range& r) : begin(r.begin->copy()), end(r.end->copy()), tableWidth(r.tableWidth) {}
+	Range(CellRefExpr* bg, CellRefExpr* ed);
+	Range(const Range& r) : begin(r.begin->copy()), end(r.end->copy()) {}
 	Range& operator=(const Range& r);
 	void beginIter();
 	ExprPointer* next();
@@ -85,7 +53,7 @@ protected:
 	Range range;
 public:
 	FunctionExpr(Range r) : range(r) {}
-	FunctionExpr(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : range(begin, end, w) {}
+	FunctionExpr(CellRefExpr* begin, CellRefExpr* end) : range(begin, end) {}
 	void checkCyclic(std::vector<Expression*>);
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
@@ -98,7 +66,7 @@ public:
 class AvgFunc : public FunctionExpr {
 public:
 	AvgFunc(Range r) : FunctionExpr(r) {}
-	AvgFunc(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : FunctionExpr(begin, end, w) {}
+	AvgFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
 	double eval();
 	std::string show() const {return "avg(" + range.show() + ")";}
 	Expression* copy() const {return new AvgFunc(range);}
@@ -107,13 +75,13 @@ public:
 class SumFunc : public FunctionExpr {
 public:
 	SumFunc(Range r) : FunctionExpr(r) {}
-	SumFunc(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : FunctionExpr(begin, end, w) {}
+	SumFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
 	double eval();
 	std::string show() const {return "sum(" + range.show() + ")";}
 	Expression* copy() const {return new SumFunc(range);}
 };
 
-FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end, size_t w = 0);
+FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end);
 
 class Operator : public Expression {
 protected:

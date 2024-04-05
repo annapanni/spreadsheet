@@ -1,80 +1,33 @@
 #include "expression.hpp"
 
-ExprPointer& ExprPointer::operator=(const ExprPointer& rhs) {
-	if (&rhs != this) {
-		delete ep;
-		ep = rhs.ep->copy();
-	}
-	return *this;
-}
-
 double CellRefExpr::eval() {
-	if (content == NULL)
-		throw "uninitialized cell reference / cell reference out of bound\n";
-	return (*content)->eval();
+	return (*getPtr())->eval();
 }
 
 void CellRefExpr::checkCyclic(std::vector<Expression*> ps){
-	if (content == NULL)
-		throw "uninitialized cell\n";
 	for (Expression* expP : ps) {
-		if (*content == expP) {
+		if (*getPtr() == expP) {
 			throw "cyclic reference\n";
 		}
 	}
-	ps.push_back(**content);
-	(*content)->checkCyclic(ps);
+	ps.push_back(**getPtr());
+	(*getPtr())->checkCyclic(ps);
 }
 
-Range::Range(CellRefExpr* bg, CellRefExpr* ed, size_t w) : begin(bg), end(ed), tableWidth(w) {}
-/*
-Range::Range(CellRefExpr* bg, CellRefExpr* ed, size_t w) : tableWidth(w) {
-	//order the begin and end cells so they are in the upper left and lower right corner respectively
+Range::Range(CellRefExpr* bg, CellRefExpr* ed) {
 	std::string bgCol = bg->getCol();
 	std::string edCol = ed->getCol();
 	int bgRow = bg->getRow();
 	int edRow = ed->getRow();
-	if (bgCol <= edCol && bgRow <= edRow) {
-		begin = bg;
-		end = ed;
-	} else if (bgCol >= edCol && bgRow >= edRow){
-		begin = ed;
-		end = bg;
-	} else {//given cells are on the other diagonal
-		if (bgCol <= edCol && bgRow > edRow) {
-			CellRefExpr* tmp = bg;
-			bg = ed;
-			ed = tmp;
-			bgCol = bg->getCol();
-			edCol = ed->getCol();
-			bgRow = bg->getRow();
-			edRow = ed->getRow();
-		}
-		ExprPointer* bgp = bg->getContent();
-		ExprPointer* edp = ed->getContent();
-		std::cout << bgp->evalMe();
-		std::cout << edp->evalMe() << "\n";
-		ExprPointer* newBgp;
-		ExprPointer* newEdp;
-		if (bgp == NULL || edp == NULL) {
-			newBgp = newEdp = NULL;
-		} else {
-			int rWidth = (int)tableWidth - (int)((edp - bgp - 1) % (int)w + 1);
-			newBgp = bgp - rWidth;
-			newEdp = edp + rWidth;
-			std::cout << "switched\n";
-			std::cout << bgp->evalMe();
-			std::cout << edp->evalMe() << "\n";
-			std::cout << newBgp->evalMe();
-			std::cout << newEdp->evalMe() << "\n";
-		}
-		begin = new CellRefExpr(edCol, bgRow, newBgp);
-		end = new CellRefExpr(bgCol, edRow, newEdp);
-		delete bg;
-		delete ed;
-	}
+	std::string minCol = bgCol < edCol ? bgCol : edCol;
+	std::string maxCol = bgCol > edCol ? bgCol : edCol;
+	int minRow = bgRow < edRow ? bgRow : edRow;
+	int maxRow = bgRow > edRow ? bgRow : edRow;
+	begin = new CellRefExpr(minCol, minRow, bg->getSheet());
+	end = new CellRefExpr(maxCol, maxRow, bg->getSheet()); //assuming both cells are on the same sheet
+	delete bg;
+	delete ed;
 }
-*/
 
 Range& Range::operator=(const Range& r){
 	if (&r != this){
@@ -82,27 +35,26 @@ Range& Range::operator=(const Range& r){
 		delete end;
 		begin = r.begin->copy();
 		end = r.end->copy();
-		tableWidth = r.tableWidth;
 	}
 	return *this;
 }
 
 void Range::beginIter() {
-	ExprPointer* bp = begin->getContent();
-	ExprPointer* ep = end->getContent();
-	if (bp == NULL || ep == NULL)
-		throw "uninitialized cell reference in range\n";
-	rangeWidth = (ep - bp - 1) % (int)tableWidth + 1;
+	Sheet* sh = begin->getSheet();
+	ExprPointer* bp = begin->getPtr();
+	ExprPointer* ep = end->getPtr();
+	rangeWidth = (ep - bp - 1) % (int)sh->getWidth() + 1;
 	iterCell = bp - 1;
 	iterRow = bp;
 }
 
 ExprPointer* Range::next(){
-	ExprPointer* ep = end->getContent();
+	Sheet* sh = begin->getSheet();
+	ExprPointer* ep = end->getPtr();
 	if (iterCell+1 <= iterRow+rangeWidth) {
 		return ++iterCell;
-	} else if (iterRow + tableWidth <= ep-rangeWidth){
-		iterRow += tableWidth;
+	} else if (iterRow + sh->getWidth() <= ep-rangeWidth){
+		iterRow += sh->getWidth();
 		iterCell = iterRow;
 		return iterCell;
 	} else {
@@ -125,12 +77,12 @@ void FunctionExpr::checkCyclic(std::vector<Expression*> ps) {
 	}
 }
 
-FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end, size_t w){
+FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end){
 	switch (fn) {
 		case AVG:
-			return new AvgFunc(begin, end, w);
+			return new AvgFunc(begin, end);
 		case SUM:
-			return new SumFunc(begin, end, w);
+			return new SumFunc(begin, end);
 		default:
 			return NULL;
 	}

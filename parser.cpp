@@ -121,13 +121,19 @@ Expression* Parser::function(Sheet* shp){
 		if (match(LEFT_BR)) {
 			if (fname == INVALID)
 				throw "invalid function name\n";
-			CellRefExpr* c1 = cell(shp);
-			consume(COLON, "invalid range in function\n");
-			CellRefExpr* c2 = cell(shp);
-			consume(RIGHT_BR, "mismatched brackets\n");
+			CellRefExpr* c1 = NULL;
+			CellRefExpr* c2 = NULL;
+			try {
+				c1 = cell(shp);
+				consume(COLON, "invalid range in function\n");
+				c2 = cell(shp);
+				consume(RIGHT_BR, "mismatched brackets\n");
+			} catch (const char* msg){
+				delete c1;
+				delete c2;
+				throw msg;
+			}
 			if (c1!=NULL && c2!=NULL) {
-				if (shp)
-					return newFunctionExpr(fname, c1, c2, shp->getWidth());
 				return newFunctionExpr(fname, c1, c2);
 			} else {
 				delete c1;
@@ -175,12 +181,7 @@ CellRefExpr* Parser::cell(Sheet* shp){
 			int row = stoi(numstr, &pos);
 			if (pos < numstr.size())
 				throw "invalid cell\n";
-			if (shp) {
-				size_t cn = shp->colNumber(col);
-				if (shp->checkRow(row) && shp->checkCol(cn))
-					return new CellRefExpr(col, row, (*shp)[row-1] + cn-1);
-			}
-			return new CellRefExpr(col, row);
+			return new CellRefExpr(col, row, shp);
 		} catch (const std::bad_cast& bc) { throw "tokenization error\n";
 		} catch (const std::invalid_argument& ia) {throw "invalid cell\n";}
 	}

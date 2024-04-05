@@ -56,6 +56,14 @@ std::string Sheet::colLetter(size_t n) const {
 	return col;
 }
 
+ExprPointer* Sheet::parseCell(std::string col, size_t row) const {
+	size_t cn = colNumber(col);
+	if (checkRow(row) && checkCol(cn)) {
+		return &(table[(row-1)*width + cn -1]); //indexing from 0
+	}
+	throw "index out of range\n";
+}
+
 void Sheet::copyTo(Sheet& sh) const {
 	size_t minw = sh.width < width ? sh.width : width;
 	size_t minh = sh.height < height ? sh.height : height;
