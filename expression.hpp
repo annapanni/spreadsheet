@@ -14,6 +14,7 @@ public:
 	int row;
 	CellId(std::string col, int row) : col(col), row(row) {}
 	CellId(std::string);
+	size_t colNumber() const {return Sheet::colNumber(col);}
 };
 
 class CellRefExpr : public Expression {
