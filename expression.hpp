@@ -46,6 +46,8 @@ class CellRefExpr : public Expression {
 public:
 	CellRefExpr(std::string col, int row) : col(col), row(row) {}
 	CellRefExpr(std::string col, int row, ExprPointer* e) : col(col), row(row), content(e) {}
+	std::string getCol() const {return col;}
+	int getRow() const {return row;}
 	ExprPointer* getContent() const {return content;}
 	double eval();
 	void checkCyclic(std::vector<Expression*>);
@@ -62,7 +64,7 @@ class Range {
 	ExprPointer* iterRow;
 	ExprPointer* iterCell;
 public:
-	Range(CellRefExpr* begin, CellRefExpr* end, size_t w=0) : begin(begin), end(end), tableWidth(w) {}
+	Range(CellRefExpr* bg, CellRefExpr* ed, size_t w=0);
 	Range(const Range& r) : begin(r.begin->copy()), end(r.end->copy()), tableWidth(r.tableWidth) {}
 	Range& operator=(const Range& r);
 	void beginIter();
