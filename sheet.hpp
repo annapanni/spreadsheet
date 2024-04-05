@@ -24,8 +24,8 @@ public:
 			return table + i*width;
 		throw "index out of range\n";
 	}
-	size_t colNumber(std::string) const;
-	std::string colLetter (size_t) const;
+	static size_t colNumber(std::string);
+	static std::string colLetter (size_t);
 	ExprPointer* parseCell(std::string col, size_t row) const;
 	bool checkRow(size_t r) const {return r <= height && r > 0;}
 	bool checkCol(size_t col) const {return col <= width && col > 0;}

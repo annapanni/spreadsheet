@@ -37,7 +37,7 @@ Sheet& Sheet::operator=(const Sheet& sh){
 	return *this;
 }
 
-size_t Sheet::colNumber(std::string str) const {
+size_t Sheet::colNumber(std::string str) {
 	size_t col = 0;
 	for (char c : str) {
 		if (!std::isalpha(c))
@@ -47,7 +47,7 @@ size_t Sheet::colNumber(std::string str) const {
 	return col;
 }
 
-std::string Sheet::colLetter(size_t n) const {
+std::string Sheet::colLetter(size_t n) {
 	std::string col = "";
 	while (n > 0){
 		col.insert(0, 1, (char)n%26 + 'a' - 1);
