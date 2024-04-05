@@ -173,6 +173,7 @@ CellRefExpr* Parser::cell(Sheet* shp){
 	if(match(STRING)){
 		try	{
 			std::string cellstr = dynamic_cast<DataToken<std::string>*>(prev())->getContent();
+			/*
 			size_t i;
 			for (i = 0; i < cellstr.size() && !std::isdigit(cellstr[i]); i++) {}
 			std::string col = cellstr.substr(0, i);
@@ -181,7 +182,8 @@ CellRefExpr* Parser::cell(Sheet* shp){
 			int row = stoi(numstr, &pos);
 			if (pos < numstr.size())
 				throw "invalid cell\n";
-			return new CellRefExpr(col, row, shp);
+			*/
+			return new CellRefExpr(cellstr, shp);
 		} catch (const std::bad_cast& bc) { throw "tokenization error\n";
 		} catch (const std::invalid_argument& ia) {throw "invalid cell\n";}
 	}

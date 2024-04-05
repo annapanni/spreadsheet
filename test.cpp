@@ -14,10 +14,10 @@ TEST(Expression, Number){
 	delete nc;
 }
 TEST(Expression, CellRef){
-	CellRefExpr empty("a", 6);
+	CellRefExpr empty("a6");
 	EXPECT_THROW(empty.eval(), const char*);
 	Sheet sh(3, 3, 5);
-	CellRefExpr c (std::string("b"), 3, &sh);
+	CellRefExpr c (std::string("b3"), &sh);
 	EXPECT_EQ(c.eval(), 5);
 	EXPECT_EQ(c.show(), "b3");
 	EXPECT_EQ(c.getCol(), "b");
@@ -33,9 +33,9 @@ TEST(Expression, CellRef){
 
 TEST (Expression, Range){
 	Sheet sh(3,3); //cant test range independently
-	CellRefExpr* a1 = new CellRefExpr("a", 1, &sh);
-	CellRefExpr* b3 = new CellRefExpr("b", 3, &sh);
-	CellRefExpr* c2 = new CellRefExpr("c", 2, &sh);
+	CellRefExpr* a1 = new CellRefExpr("a1", &sh);
+	CellRefExpr* b3 = new CellRefExpr("b3", &sh);
+	CellRefExpr* c2 = new CellRefExpr("c2", &sh);
 
 	Range r1(a1->copy(), a1->copy());
 	r1.beginIter();

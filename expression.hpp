@@ -8,20 +8,28 @@
 #include "expression_core.hpp"
 #include "sheet.hpp"
 
-class CellRefExpr : public Expression {
+class CellId {
+public:
 	std::string col;
 	int row;
+	CellId(std::string col, int row) : col(col), row(row) {}
+	CellId(std::string);
+};
+
+class CellRefExpr : public Expression {
+	CellId cell;
 	Sheet* sh;
 public:
-	CellRefExpr(std::string col, int row, Sheet* sh = NULL) : col(col), row(row), sh(sh) {}
-	std::string getCol() const {return col;}
-	int getRow() const {return row;}
+	CellRefExpr(std::string col, int row, Sheet* sh = NULL) : cell(CellId(col, row)), sh(sh) {}
+	CellRefExpr(std::string str, Sheet* sh = NULL) : cell(CellId(str)), sh(sh) {}
+	std::string getCol() const {return cell.col;}
+	int getRow() const {return cell.row;}
 	Sheet* getSheet() const {return sh;}
-	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(col, row);}
+	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(cell.col, cell.row);}
 	double eval();
 	void checkCyclic(std::vector<Expression*>);
-	std::string show() const {return col + std::to_string(row);}
-	CellRefExpr* copy() const {return new CellRefExpr(col, row, sh);}
+	std::string show() const {return cell.col + std::to_string(cell.row);}
+	CellRefExpr* copy() const {return new CellRefExpr(*this);}
 };
 
 class Range {

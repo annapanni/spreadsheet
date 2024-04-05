@@ -1,5 +1,19 @@
 #include "expression.hpp"
 
+CellId::CellId(std::string cellstr){
+	try	{
+		size_t i;
+		for (i = 0; i < cellstr.size() && !std::isdigit(cellstr[i]); i++) {}
+		col = cellstr.substr(0, i);
+		size_t pos;
+		std::string numstr = cellstr.substr(i, cellstr.size()-i);
+		row = stoi(numstr, &pos);
+		if (pos < numstr.size())
+			throw "invalid cell\n";
+	} catch (const std::invalid_argument& ia) {throw "invalid cell\n";}
+}
+
+
 double CellRefExpr::eval() {
 	return (*getPtr())->eval();
 }
