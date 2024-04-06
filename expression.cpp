@@ -4,7 +4,7 @@ CellId::CellId(std::string cellstr){
 	try	{
 		size_t i;
 		for (i = 0; i < cellstr.size() && !std::isdigit(cellstr[i]); i++) {}
-		col = cellstr.substr(0, i);
+		colNum = Sheet::colNumber(cellstr.substr(0, i));
 		size_t pos;
 		std::string numstr = cellstr.substr(i, cellstr.size()-i);
 		row = stoi(numstr, &pos);

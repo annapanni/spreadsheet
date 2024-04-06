@@ -24,11 +24,12 @@ public:
 			return table + i*width;
 		throw "index out of range\n";
 	}
-	static size_t colNumber(std::string);
-	static std::string colLetter (size_t);
-	ExprPointer* parseCell(std::string col, size_t row) const;
-	bool checkRow(size_t r) const {return r <= height && r > 0;}
-	bool checkCol(size_t col) const {return col <= width && col > 0;}
+	static int colNumber(std::string);
+	static std::string colLetter (int);
+	ExprPointer* parseCell(int col, int row) const;
+	ExprPointer* parseCell(std::string col, int row) const;
+	bool checkRow(int r) const {return r <= (int)height && r > 0;}
+	bool checkCol(int col) const {return col <= (int)width && col > 0;}
 
 	void copyTo(Sheet& sh) const;
 	void resize(size_t w, size_t h, double fill = 0);

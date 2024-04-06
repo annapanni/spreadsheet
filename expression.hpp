@@ -10,11 +10,11 @@
 
 class CellId {
 public:
-	std::string col;
+	int colNum;
 	int row;
-	CellId(std::string col, int row) : col(col), row(row) {}
+	CellId(std::string col, int row) : colNum(Sheet::colNumber(col)), row(row) {}
 	CellId(std::string);
-	size_t colNumber() const {return Sheet::colNumber(col);}
+	std::string colLetter() const {return Sheet::colLetter(colNum);}
 };
 
 class CellRefExpr : public Expression {
@@ -23,13 +23,13 @@ class CellRefExpr : public Expression {
 public:
 	CellRefExpr(std::string col, int row, Sheet* sh = NULL) : cell(CellId(col, row)), sh(sh) {}
 	CellRefExpr(std::string str, Sheet* sh = NULL) : cell(CellId(str)), sh(sh) {}
-	std::string getCol() const {return cell.col;}
+	std::string getCol() const {return cell.colLetter();}
 	int getRow() const {return cell.row;}
 	Sheet* getSheet() const {return sh;}
-	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(cell.col, cell.row);}
+	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(cell.colNum, cell.row);}
 	double eval();
 	void checkCyclic(std::vector<Expression*>);
-	std::string show() const {return cell.col + std::to_string(cell.row);}
+	std::string show() const {return cell.colLetter() + std::to_string(cell.row);}
 	CellRefExpr* copy() const {return new CellRefExpr(*this);}
 };
 

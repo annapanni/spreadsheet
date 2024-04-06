@@ -37,8 +37,8 @@ Sheet& Sheet::operator=(const Sheet& sh){
 	return *this;
 }
 
-size_t Sheet::colNumber(std::string str) {
-	size_t col = 0;
+int Sheet::colNumber(std::string str) {
+	int col = 0;
 	for (char c : str) {
 		if (!std::isalpha(c))
 			throw "invalid column\n";
@@ -47,7 +47,7 @@ size_t Sheet::colNumber(std::string str) {
 	return col;
 }
 
-std::string Sheet::colLetter(size_t n) {
+std::string Sheet::colLetter(int n) {
 	std::string col = "";
 	while (n > 0){
 		col.insert(0, 1, (char)n%26 + 'a' - 1);
@@ -56,12 +56,15 @@ std::string Sheet::colLetter(size_t n) {
 	return col;
 }
 
-ExprPointer* Sheet::parseCell(std::string col, size_t row) const {
-	size_t cn = colNumber(col);
-	if (checkRow(row) && checkCol(cn)) {
-		return &(table[(row-1)*width + cn -1]); //indexing from 0
+ExprPointer* Sheet::parseCell(int col, int row) const {
+	if (checkRow(row) && checkCol(col)) {
+		return &(table[(row-1)*width + col -1]); //indexing from 0
 	}
 	throw "index out of range\n";
+}
+ExprPointer* Sheet::parseCell(std::string col, int row) const {
+	int cn = colNumber(col);
+	return parseCell(cn, row);
 }
 
 void Sheet::copyTo(Sheet& sh) const {
@@ -86,13 +89,13 @@ void Sheet::print() const {
 		return;
 	}
 	std::cout << std::setw((int)std::log10(height)+2) << std::setfill(' ') << ' ';
-	for (size_t col = 0; col < width; col++) {
+	for (int col = 0; col < (int)width; col++) {
 		std::cout << colLetter(col+1) << "\t";
 	}
 	std::cout << std::endl;
-	for (size_t row = 0; row < height; row++) {
+	for (int row = 0; row < (int)height; row++) {
 		std::cout << std::setw((int)std::log10(height)+1) << row+1 << "|";
-		for (size_t col = 0; col < width; col++) {
+		for (int col = 0; col < (int)width; col++) {
 			try {
 				std::cout << table[row*width + col].evalMe() << "\t";
 			} catch (const char* msg){

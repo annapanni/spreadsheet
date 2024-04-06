@@ -20,6 +20,7 @@ int main(void) {
 	std::string command;
 	help();
 	while(!exit){
+		std::cout << "> ";
 		std::cin >> command;
 		if (command == "print") {
 			sh.print();
@@ -27,10 +28,10 @@ int main(void) {
 			std::string cellstr;
 			std::cin >> cellstr;
 			CellId cid(cellstr);
-			if (sh.checkRow(cid.row) && sh.checkCol(cid.colNumber())){
+			if (sh.checkRow(cid.row) && sh.checkCol(cid.colNum)){
 				std::string inp;
 				std::cin >> inp;
-				Parser(inp).parseTo(&sh, sh[cid.row-1][cid.colNumber()-1]);
+				Parser(inp).parseTo(&sh, sh[cid.row-1][cid.colNum-1]);
 			} else {
 				std::cout << "\nindex out of range\n";
 			}
@@ -38,10 +39,10 @@ int main(void) {
 			std::string cellstr;
 			std::cin >> cellstr;
 			CellId cid(cellstr);
-			if (sh.checkRow(cid.row) && sh.checkCol(cid.colNumber())){
-				std::cout << sh[cid.row-1][cid.colNumber()-1]->show() << " = ";
+			if (sh.checkRow(cid.row) && sh.checkCol(cid.colNum)){
+				std::cout << sh[cid.row-1][cid.colNum-1]->show() << " = ";
 				try	{
-					std::cout << sh[cid.row-1][cid.colNumber()-1].evalMe() << '\n';
+					std::cout << sh[cid.row-1][cid.colNum-1].evalMe() << '\n';
 				} catch (const char* msg) {
 					std::cout << msg;
 				}
