@@ -17,13 +17,6 @@ Sheet::Sheet(size_t w, size_t h, double fill) : width(w), height(h){
 	}
 }
 
-Sheet::Sheet(std::vector<double> vec, size_t w) : width(w), height(vec.size()/w){
-	table = new ExprPointer[vec.size()];
-	for (size_t i = 0; i < vec.size(); i++) {
-		table[i] = ExprPointer(new NumberExpr(vec[i]));
-	}
-}
-
 Sheet& Sheet::operator=(const Sheet& sh){
 	height = sh.height;
 	width = sh.width;

@@ -29,6 +29,7 @@ public:
 		}
 		return *this;
 	}
+	bool operator==(const ExprPointer& rhs) const {return ep == rhs.ep;}
 	Expression* operator->() const {return ep;}
 	bool operator==(Expression* p) {return ep == p;}
 	double evalMe() {return ep->safeEval({ep});}

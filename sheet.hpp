@@ -15,7 +15,6 @@ public:
 	Sheet() : table(NULL), width(0), height(0) {}
 	Sheet(const Sheet&);
 	Sheet(size_t w, size_t h, double fill = 0);
-	Sheet(std::vector<double> vec, size_t w);
 	size_t getWidth() const {return width;}
 	size_t getHeight() const {return height;} // unused
 	Sheet& operator=(const Sheet&);

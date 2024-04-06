@@ -134,6 +134,54 @@ TEST (Expression, Sub){
 	delete opcpy;
 }
 
+TEST (Sheet, statics){
+	EXPECT_EQ(Sheet::colLetter(4), "d");
+	EXPECT_EQ(Sheet::colLetter(27), "aa");
+	EXPECT_EQ(Sheet::colNumber("e"), 5);
+	EXPECT_EQ(Sheet::colNumber("ab"), 28);
+	EXPECT_THROW(Sheet::colNumber("*"), const char*);
+	Sheet sh2;
+}
+
+TEST (Sheet, constrAndGetters){
+	Sheet sh2;
+	{
+		Sheet sh(5, 6, 3);
+		EXPECT_EQ(sh.getWidth(), 5);
+		EXPECT_EQ(sh.getHeight(), 6);
+		EXPECT_EQ(sh[0][0]->eval(), 3);
+		sh[0][0] = new NumberExpr(7);
+		EXPECT_EQ(sh[0][0]->eval(), 7);
+		EXPECT_THROW(sh[6][0]->show(), const char*);
+		sh2 = sh;
+	}
+	EXPECT_EQ(sh2[0][1]->eval(), 3);
+	EXPECT_EQ(sh2[0][0]->eval(), 7);
+}
+
+TEST (Sheet, functions){
+	Sheet sh(5, 6, 3);
+	EXPECT_EQ(sh[0][0], *(sh.parseCell(1, 1)));
+	EXPECT_EQ(sh[0][0], *(sh.parseCell("a", 1)));
+	EXPECT_EQ(sh[0][2], *(sh.parseCell(3, 1)));
+	EXPECT_EQ(sh[1][2], *(sh.parseCell("c", 2)));
+	EXPECT_THROW(sh.parseCell("f", 2), const char*);
+	EXPECT_EQ(sh.checkRow(6), true);
+	EXPECT_EQ(sh.checkRow(0), false);
+	EXPECT_EQ(sh.checkCol(5), true);
+	EXPECT_EQ(sh.checkCol(0), false);
+
+	sh[0][0] = new NumberExpr(7);
+	Sheet sh2(2,2);
+	sh.copyTo(sh2);
+	EXPECT_EQ(sh2[0][0]->eval(), 7);
+	sh2.resize(4, 3, 1.2);
+	EXPECT_EQ(sh2.getWidth(), 4);
+	EXPECT_EQ(sh2.getHeight(), 3);
+	EXPECT_EQ(sh2[2][3]->eval(), 1.2);
+}
+
+
 TEST (Deleting, deleting){
 	delete a1;
 	delete b3;
