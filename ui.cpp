@@ -27,13 +27,17 @@ int main(void) {
 		} else if (command == "set") {
 			std::string cellstr;
 			std::cin >> cellstr;
-			CellId cid(cellstr);
-			if (sh.checkRow(cid.row) && sh.checkCol(cid.colNum)){
-				std::string inp;
-				std::cin >> inp;
-				Parser(inp).parseTo(&sh, sh[cid.row-1][cid.colNum-1]);
-			} else {
-				std::cout << "\nindex out of range\n";
+			try	{
+				CellId cid(cellstr);
+				if (sh.checkRow(cid.row) && sh.checkCol(cid.colNum)){
+					std::string inp;
+					std::cin >> inp;
+					Parser(inp).parseTo(&sh, sh[cid.row-1][cid.colNum-1]);
+				} else {
+					std::cout << "index out of range\n";
+				}
+			} catch (const char* msg){
+				std::cout << msg;
 			}
 		} else if (command == "show") {
 			std::string cellstr;
@@ -47,7 +51,7 @@ int main(void) {
 					std::cout << msg;
 				}
 			} else {
-				std::cout << "\nindex out of range\n";
+				std::cout << "index out of range\n";
 			}
 		} else if (command == "new") {
 			size_t w, h;

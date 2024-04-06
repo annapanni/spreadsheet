@@ -17,12 +17,11 @@ void Parser::addTokenFromStr(std::string& str_buffer){
 			size_t pos;
 			double d = std::stod(str_buffer, &pos);
 			if (pos < str_buffer.size()) {
-				throw "couldn't convert entire number\n";
+				addToken(str_buffer);
+			} else {
+				addToken(d);
 			}
-			addToken(d);
 		} catch (const std::invalid_argument& ia){
-			addToken(str_buffer);
-		} catch (const char* msg){
 			addToken(str_buffer);
 		}
 		str_buffer = "";
@@ -63,7 +62,7 @@ Token* Parser::consume(Token_type tt, const char* msg){
 Expression* Parser::expression(Sheet* shp){
 	Expression* expr = factor(shp);
 	if (expr == NULL)
-		throw "not enough arguments (+-)\n";
+		throw "not enough arguments\n";
 	while (match(MINUS) || match(PLUS)){
 		Token_type operand = prev()->getType();
 		Expression* rhs;
@@ -75,7 +74,7 @@ Expression* Parser::expression(Sheet* shp){
 		}
 		if (rhs == NULL){
 			delete expr;
-			throw "not enough arguments (+-)\n";
+			throw "not enough arguments\n";
 		}
 		expr = operandFromToken(operand, expr, rhs);
 	}
@@ -83,8 +82,6 @@ Expression* Parser::expression(Sheet* shp){
 }
 Expression* Parser::factor(Sheet* shp){
 	Expression* expr = unary(shp);
-	if (expr == NULL)
-		throw "not enough arguments (*/)\n";
 	while (match(SLASH) || match(STAR)){
 		Token_type operand = prev()->getType();
 		Expression* rhs;
@@ -173,19 +170,8 @@ CellRefExpr* Parser::cell(Sheet* shp){
 	if(match(STRING)){
 		try	{
 			std::string cellstr = dynamic_cast<DataToken<std::string>*>(prev())->getContent();
-			/*
-			size_t i;
-			for (i = 0; i < cellstr.size() && !std::isdigit(cellstr[i]); i++) {}
-			std::string col = cellstr.substr(0, i);
-			size_t pos;
-			std::string numstr = cellstr.substr(i, cellstr.size()-i);
-			int row = stoi(numstr, &pos);
-			if (pos < numstr.size())
-				throw "invalid cell\n";
-			*/
 			return new CellRefExpr(cellstr, shp);
-		} catch (const std::bad_cast& bc) { throw "tokenization error\n";
-		} catch (const std::invalid_argument& ia) {throw "invalid cell\n";}
+		} catch (const std::bad_cast& bc) { throw "tokenization error\n";}
 	}
 	return expr;
 }
@@ -193,7 +179,7 @@ CellRefExpr* Parser::cell(Sheet* shp){
 Expression* Parser::parse(Sheet* shp){
 	current = 0;
 	Expression* expr = NULL;
-	try{
+	try {
 		expr = expression(shp);
 	} catch (const char* msg) {
 		std::cout << msg;
