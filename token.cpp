@@ -1,25 +1,25 @@
 #include "token.hpp"
 
-void Token::show(){
+std::string Token::show(){
 	switch (type) {
 		case MINUS:
-			std::cout << "minus"; break;
+			return "minus";
 		case PLUS:
-			std::cout << "plus"; break;
+			return "plus";
 		case SLASH:
-			std::cout << "slash"; break;
+			return "slash";
 		case STAR:
-			std::cout << "star"; break;
+			return "star";
 		case LEFT_BR:
-			std::cout << "left br"; break;
+			return "left br";
 		case RIGHT_BR:
-			std::cout << "right br"; break;
+			return "right br";
 		case COLON:
-			std::cout << "colon"; break;
+			return "colon";
 		case NUMBER:
-			std::cout << "number"; break;
+			return "number";
 		default:
-			std::cout << "string";
+			return "string";
 	}
 }
 

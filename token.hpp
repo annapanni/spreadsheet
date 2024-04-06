@@ -17,8 +17,8 @@ public:
 	Token(Token_type t) : type(t) {}
 	Token_type getType() const {return type;}
 
-	void show() ;
-
+	std::string show() ;
+	virtual Token* copy() {return new Token(type);}
 	static Token_type parseTokenType(char c);
 	virtual ~Token(){}
 };
@@ -29,6 +29,7 @@ class DataToken : public Token {
 public:
 	DataToken(Token_type tt, T s) : Token(tt), content(s) {}
 	T getContent() const {return content;}
+	Token* copy() {return new DataToken(type, content);}
 };
 
 #endif

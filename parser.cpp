@@ -44,6 +44,20 @@ Parser::Parser(std::string input){
 	addTokenFromStr(str_buffer);
 }
 
+Parser& Parser::operator=(const Parser& p){
+	if (&p != this) {
+		for (size_t i = 0; i < tokens.size(); i++) {
+			delete tokens[i];
+		}
+		tokens.resize(0);
+		for (Token* t : p.tokens) {
+			tokens.push_back(t->copy());
+		}
+		current = p.current;
+	}
+	return *this;
+}
+
 bool Parser::match(Token_type tt){
 	if (check(tt)) {
 		if (!atEnd())

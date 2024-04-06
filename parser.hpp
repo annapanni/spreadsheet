@@ -28,6 +28,8 @@ class Parser {
 	CellRefExpr* cell(Sheet* shp = NULL);
 public:
 	Parser(std::string input);
+	Parser& operator=(const Parser& p);
+	Parser(const Parser& p) {*this = p;}
 
 	void addToken(Token_type t);
 	void addToken(std::string s);
@@ -37,12 +39,12 @@ public:
 	Expression* parse(Sheet* shp = NULL);
 	void parseTo(Sheet* shp, ExprPointer& ep);
 
-	void show(){
+	std::string show(){
+		std::string outp = "";
 		for (Token*& t : tokens) {
-			t->show();
-			std::cout << ", ";
+			outp += t->show() + ", ";
 		}
-		std::cout << std::endl;
+		return outp;
 	}
 
 	~Parser() {
