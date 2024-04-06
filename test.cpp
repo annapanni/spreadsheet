@@ -31,12 +31,12 @@ TEST(Expression, CellRef){
 	delete cc;
 }
 
-TEST (Expression, Range){
-	Sheet sh(3,3); //cant test range independently
-	CellRefExpr* a1 = new CellRefExpr("a1", &sh);
-	CellRefExpr* b3 = new CellRefExpr("b3", &sh);
-	CellRefExpr* c2 = new CellRefExpr("c2", &sh);
+Sheet sh(3,3, 5);
+CellRefExpr* a1 = new CellRefExpr("a1", &sh);
+CellRefExpr* b3 = new CellRefExpr("b3", &sh);
+CellRefExpr* c2 = new CellRefExpr("c2", &sh);
 
+TEST (Expression, Range){
 	Range r1(a1->copy(), a1->copy());
 	r1.beginIter();
 	EXPECT_EQ(r1.next(), a1->getPtr());
@@ -62,7 +62,79 @@ TEST (Expression, Range){
 	db = 0;
 	while (r4.next()) {db++;}
 	EXPECT_EQ(db, 4);
+}
 
+TEST (Expression, Function){
+	SumFunc sum = SumFunc(a1->copy(), b3->copy());
+	EXPECT_THROW(sum.checkCyclic({**(a1->getPtr()+1)}), const char*);
+	EXPECT_EQ(sum.eval(), 30);
+	FunctionExpr* avg = newFunctionExpr(AVG, c2->copy(), a1->copy());
+	EXPECT_NO_THROW(avg->checkCyclic({**(b3->getPtr())}));
+	EXPECT_EQ(avg->eval(), 5);
+	EXPECT_EQ(avg->show(), "avg(a1:c2)");
+	delete avg;
+	EXPECT_EQ(FunctionExpr::parseFname("avg"), AVG);
+	EXPECT_EQ(FunctionExpr::parseFname("sum"), SUM);
+	EXPECT_EQ(FunctionExpr::parseFname("ddfas"), INVALID);
+}
+
+TEST (Expression, Mult){
+	Expression* opcpy;
+	{
+	Mult op = Mult(a1->copy(), b3->copy());
+	EXPECT_EQ(op.eval(), 25);
+	EXPECT_EQ(op.show(), "(a1*b3)");
+	opcpy = op.copy();
+	}
+	EXPECT_EQ(opcpy->eval(), 25);
+	EXPECT_EQ(opcpy->show(), "(a1*b3)");
+	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	delete opcpy;
+}
+
+TEST (Expression, Div){
+	Expression* opcpy;
+	{
+	Div op = Div(a1->copy(), b3->copy());
+	EXPECT_EQ(op.eval(), 1);
+	EXPECT_EQ(op.show(), "(a1/b3)");
+	opcpy = op.copy();
+	}
+	EXPECT_EQ(opcpy->eval(), 1);
+	EXPECT_EQ(opcpy->show(), "(a1/b3)");
+	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	delete opcpy;
+}
+
+TEST (Expression, Add){
+	Expression* opcpy;
+	{
+	Add op = Add(a1->copy(), b3->copy());
+	EXPECT_EQ(op.eval(), 10);
+	EXPECT_EQ(op.show(), "(a1+b3)");
+	opcpy = op.copy();
+	}
+	EXPECT_EQ(opcpy->eval(), 10);
+	EXPECT_EQ(opcpy->show(), "(a1+b3)");
+	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	delete opcpy;
+}
+
+TEST (Expression, Sub){
+	Expression* opcpy;
+	{
+	Sub op = Sub(a1->copy(), b3->copy());
+	EXPECT_EQ(op.eval(), 0);
+	EXPECT_EQ(op.show(), "(a1-b3)");
+	opcpy = op.copy();
+	}
+	EXPECT_EQ(opcpy->eval(), 0);
+	EXPECT_EQ(opcpy->show(), "(a1-b3)");
+	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	delete opcpy;
+}
+
+TEST (Deleting, deleting){
 	delete a1;
 	delete b3;
 	delete c2;
