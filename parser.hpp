@@ -36,16 +36,11 @@ public:
 	void addToken(double n);
 	void addTokenFromStr(std::string& str_buffer);
 
+	Expression* parseThrow(Sheet* shp = NULL);
 	Expression* parse(Sheet* shp = NULL);
 	void parseTo(Sheet* shp, ExprPointer& ep);
 
-	std::string show(){
-		std::string outp = "";
-		for (Token*& t : tokens) {
-			outp += t->show() + ", ";
-		}
-		return outp;
-	}
+	std::string show();
 
 	~Parser() {
 		for (size_t i = 0; i < tokens.size(); i++) {

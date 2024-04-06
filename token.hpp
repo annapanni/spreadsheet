@@ -17,7 +17,7 @@ public:
 	Token(Token_type t) : type(t) {}
 	Token_type getType() const {return type;}
 
-	std::string show() ;
+	std::string show();
 	virtual Token* copy() {return new Token(type);}
 	static Token_type parseTokenType(char c);
 	virtual ~Token(){}

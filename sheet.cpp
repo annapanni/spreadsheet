@@ -43,7 +43,7 @@ int Sheet::colNumber(std::string str) {
 std::string Sheet::colLetter(int n) {
 	std::string col = "";
 	while (n > 0){
-		col.insert(0, 1, (char)n%26 + 'a' - 1);
+		col.insert(0, 1, (char)(n%26 + 'a' - 1));
 		n = n/26;
 	}
 	return col;

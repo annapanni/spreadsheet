@@ -96,6 +96,8 @@ Expression* Parser::expression(Sheet* shp){
 }
 Expression* Parser::factor(Sheet* shp){
 	Expression* expr = unary(shp);
+	if (expr == NULL)
+		throw "not enough arguments\n";
 	while (match(SLASH) || match(STAR)){
 		Token_type operand = prev()->getType();
 		Expression* rhs;
@@ -162,7 +164,7 @@ Expression* Parser::primary(Sheet* shp){
 			DataToken<double>* nt = dynamic_cast<DataToken<double>*>(prev());
 			return new NumberExpr(nt->getContent());
 		} catch (const std::bad_cast& bc){
-			throw "invalid number\n";
+			throw "tokenization error\n";
 		}
 	} else if (match(LEFT_BR)){
 		expr = expression(shp);
@@ -185,9 +187,14 @@ CellRefExpr* Parser::cell(Sheet* shp){
 		try	{
 			std::string cellstr = dynamic_cast<DataToken<std::string>*>(prev())->getContent();
 			return new CellRefExpr(cellstr, shp);
-		} catch (const std::bad_cast& bc) { throw "tokenization error\n";}
+		} catch (const std::bad_cast& bc) {throw "tokenization error\n";}
 	}
 	return expr;
+}
+
+Expression* Parser::parseThrow(Sheet* shp){
+	current = 0;
+	return expression(shp);
 }
 
 Expression* Parser::parse(Sheet* shp){
@@ -197,8 +204,6 @@ Expression* Parser::parse(Sheet* shp){
 		expr = expression(shp);
 	} catch (const char* msg) {
 		std::cout << msg;
-		delete expr;
-		expr = NULL;
 	}
 	return expr;
 }
@@ -208,6 +213,14 @@ void Parser::parseTo(Sheet* shp, ExprPointer& ep){
 	if (expr) {
 		ep = expr;
 	}
+}
+
+std::string Parser::show(){
+	std::string outp = "";
+	for (Token*& t : tokens) {
+		outp += t->show() + ", ";
+	}
+	return outp;
 }
 
 Operator* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs){

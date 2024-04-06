@@ -3,6 +3,7 @@
 
 #include "expression.hpp"
 #include "sheet.hpp"
+#include "parser.hpp"
 
 TEST(Expression, Number){
 	NumberExpr n (3);
@@ -14,7 +15,8 @@ TEST(Expression, Number){
 	delete nc;
 }
 TEST(Expression, CellRef){
-	CellRefExpr empty("a6");
+	CellRefExpr empty("sdf645");
+	EXPECT_EQ(empty.show(), "sdf645");
 	EXPECT_THROW(empty.eval(), const char*);
 	Sheet sh(3, 3, 5);
 	CellRefExpr c (std::string("b3"), &sh);
@@ -139,6 +141,8 @@ TEST (Sheet, statics){
 	EXPECT_EQ(Sheet::colLetter(27), "aa");
 	EXPECT_EQ(Sheet::colNumber("e"), 5);
 	EXPECT_EQ(Sheet::colNumber("ab"), 28);
+	EXPECT_EQ(Sheet::colLetter(Sheet::colNumber("abcdf")), "abcdf");
+	EXPECT_EQ(Sheet::colNumber(Sheet::colLetter(4268)), 4268);
 	EXPECT_THROW(Sheet::colNumber("*"), const char*);
 	Sheet sh2;
 }
@@ -181,6 +185,67 @@ TEST (Sheet, functions){
 	EXPECT_EQ(sh2[2][3]->eval(), 1.2);
 }
 
+TEST (Parser, constructorsAndTokens){
+	Parser p3("dd+(23-34/(-12))");
+	EXPECT_EQ(p3.show(), "string, plus, left br, number, minus, number, slash, left br, minus, number, right br, right br, ");
+	{
+		Parser p1("a+b+22*3");
+		Parser p2 = p1;
+		EXPECT_EQ(p1.show(), "string, plus, string, plus, number, star, number, ");
+		EXPECT_EQ(p2.show(), "string, plus, string, plus, number, star, number, ");
+		p3 = p2;
+	}
+	EXPECT_EQ(p3.show(), "string, plus, string, plus, number, star, number, ");
+	Parser p("");
+	p.addToken(PLUS);
+	p.addToken("hali");
+	p.addToken(5.2);
+	p.addToken(STAR);
+	std::string s = "45";
+	p.addTokenFromStr(s);
+	EXPECT_EQ(p.show(), "plus, string, number, star, number, ");
+}
+
+TEST (Parser, parsing){
+	Expression* expr = Parser("-34+12*(45-20)").parse();
+	EXPECT_EQ(expr->show(), "((-1*34)+(12*(45-20)))");
+	EXPECT_EQ(expr->eval(), 266);
+	delete expr;
+	expr = Parser("a1+ sdf345* (234 +sum(c4:d34) )*2").parse();
+	EXPECT_EQ(expr->show(), "(a1+((sdf345*(234+sum(c4:d34)))*2))");
+	delete expr;
+	Sheet sh(2,3,3);
+	Parser("34+b2").parseTo(&sh, sh[0][0]);
+	EXPECT_EQ(sh[0][0]->show(), "(34+b2)");
+	EXPECT_EQ(sh[0][0]->eval(), 37);
+}
+
+TEST (Parser, parsingErrors){
+	EXPECT_THROW(Parser("").parseThrow(), const char*);
+	EXPECT_THROW(Parser("a").parseThrow(), const char*);
+	EXPECT_THROW(Parser("34+").parseThrow(), const char*);
+	EXPECT_THROW(Parser("/234").parseThrow(), const char*);
+	EXPECT_THROW(Parser("32+34*").parseThrow(), const char*);
+	EXPECT_THROW(Parser("hah(a1:b2)").parseThrow(), const char*);
+	EXPECT_THROW(Parser("sum(a1)").parseThrow(), const char*);
+	EXPECT_THROW(Parser("sum(a1:)").parseThrow(), const char*);
+	EXPECT_THROW(Parser("sum(a1:b2").parseThrow(), const char*);
+	EXPECT_THROW(Parser("12* 34 + ((12 +1)").parseThrow(), const char*);
+}
+
+TEST (Parser, evalErrors){
+	Expression* expr = Parser("a4").parse();
+	EXPECT_THROW(expr->eval(), const char*);
+	delete expr;
+
+	Sheet(1, 1);
+	Parser("a1").parseTo(&sh, sh[0][0]);
+	EXPECT_THROW(sh[0][0].evalMe(), const char*);
+	Parser("asd1").parseTo(&sh, sh[0][0]);
+	EXPECT_THROW(sh[0][0].evalMe(), const char*);
+	Parser("a10").parseTo(&sh, sh[0][0]);
+	EXPECT_THROW(sh[0][0].evalMe(), const char*);
+}
 
 TEST (Deleting, deleting){
 	delete a1;
