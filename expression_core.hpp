@@ -8,9 +8,9 @@
 
 class Expression {
 public:
-	virtual double eval() = 0;
-	virtual void checkCyclic(std::vector<Expression*>) = 0;
-	virtual double safeEval(std::vector<Expression*> ps) {checkCyclic(ps); return eval();}
+	virtual double eval() const = 0;
+	virtual void checkCyclic(std::vector<Expression*>) const = 0;
+	virtual double safeEval(std::vector<Expression*> ps) const {checkCyclic(ps); return eval();}
 	virtual std::string show() const = 0;
 	virtual Expression* copy() const = 0;
 	virtual ~Expression() {};
@@ -40,8 +40,8 @@ class NumberExpr : public Expression {
 	double value;
 public:
 	NumberExpr(double v) : value(v) {}
-	double eval() {return value;}
-	void checkCyclic(std::vector<Expression*>) {}
+	double eval() const {return value;}
+	void checkCyclic(std::vector<Expression*>) const {}
 	Expression* copy() const {return new NumberExpr(value);}
 	std::string show() const {std::ostringstream ss; ss << value; return ss.str();}
 };

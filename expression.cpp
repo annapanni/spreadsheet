@@ -13,12 +13,11 @@ CellId::CellId(std::string cellstr){
 	} catch (const std::invalid_argument& ia) {throw "invalid cell\n";}
 }
 
-
-double CellRefExpr::eval() {
+double CellRefExpr::eval() const {
 	return (*getPtr())->eval();
 }
 
-void CellRefExpr::checkCyclic(std::vector<Expression*> ps){
+void CellRefExpr::checkCyclic(std::vector<Expression*> ps) const {
 	for (Expression* expP : ps) {
 		if (*getPtr() == expP) {
 			throw "cyclic reference\n";
@@ -37,49 +36,56 @@ Range::Range(CellRefExpr* bg, CellRefExpr* ed) {
 	std::string maxCol = bgCol > edCol ? bgCol : edCol;
 	int minRow = bgRow < edRow ? bgRow : edRow;
 	int maxRow = bgRow > edRow ? bgRow : edRow;
-	begin = new CellRefExpr(minCol, minRow, bg->getSheet());
-	end = new CellRefExpr(maxCol, maxRow, bg->getSheet()); //assuming both cells are on the same sheet
+	topCell = new CellRefExpr(minCol, minRow, bg->getSheet());
+	bottomCell = new CellRefExpr(maxCol, maxRow, bg->getSheet()); //assuming both cells are on the same sheet
 	delete bg;
 	delete ed;
 }
 
 Range& Range::operator=(const Range& r){
 	if (&r != this){
-		delete begin;
-		delete end;
-		begin = r.begin->copy();
-		end = r.end->copy();
+		delete topCell;
+		delete bottomCell;
+		topCell = r.topCell->copy();
+		bottomCell = r.bottomCell->copy();
 	}
 	return *this;
 }
 
-void Range::beginIter() {
-	Sheet* sh = begin->getSheet();
-	ExprPointer* bp = begin->getPtr();
-	ExprPointer* ep = end->getPtr();
-	rangeWidth = (ep - bp - 1) % (int)sh->getWidth() + 1;
-	iterCell = bp - 1;
-	iterRow = bp;
-}
-
-ExprPointer* Range::next(){
-	Sheet* sh = begin->getSheet();
-	ExprPointer* ep = end->getPtr();
-	if (iterCell+1 <= iterRow+rangeWidth) {
-		return ++iterCell;
-	} else if (iterRow + sh->getWidth() <= ep-rangeWidth){
-		iterRow += sh->getWidth();
-		iterCell = iterRow;
-		return iterCell;
+Range::iterator& Range::iterator::operator++() {//preinkremens
+	if (actCell == NULL)
+		throw "empty iterator";
+	if (actCell + 1 <= actRow+rangeWidth) {
+		++actCell;
 	} else {
-		return NULL;//end of iteration
+		actRow += tableWidth;
+		actCell = actRow;
 	}
+	return *this;
+}
+Range::iterator Range::iterator::operator++(int) {//posztinkremens
+	iterator tmp = *this;
+	operator++();
+	return tmp;
+}
+Range::iterator Range::begin() const{
+	Sheet* sh = topCell->getSheet();
+	ExprPointer* bp = topCell->getPtr();
+	ExprPointer* ep = bottomCell->getPtr();
+	size_t rangeWidth = (ep - bp - 1) % (int)sh->getWidth() + 1;
+	return iterator(rangeWidth, sh->getWidth(), bp);
+}
+Range::iterator Range::end() const{
+	Sheet* sh = topCell->getSheet();
+	ExprPointer* bp = topCell->getPtr();
+	ExprPointer* ep = bottomCell->getPtr();
+	size_t rangeWidth = (ep - bp - 1) % (int)sh->getWidth() + 1;
+	return iterator(rangeWidth, sh->getWidth(), ep-rangeWidth+sh->getWidth());
 }
 
-void FunctionExpr::checkCyclic(std::vector<Expression*> ps) {
-	range.beginIter();
-	ExprPointer* cell;
-	while ((cell = range.next())) {
+void FunctionExpr::checkCyclic(std::vector<Expression*> ps) const {
+	Range::iterator cell;
+	for (cell = range.begin(); cell != range.end(); cell++) {
 		for (Expression* exprP : ps) {
 			if (*cell ==  exprP) {
 				throw "cyclic reference\n";
@@ -91,34 +97,32 @@ void FunctionExpr::checkCyclic(std::vector<Expression*> ps) {
 	}
 }
 
-FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end){
+FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell){
 	switch (fn) {
 		case AVG:
-			return new AvgFunc(begin, end);
+			return new AvgFunc(topCell, bottomCell);
 		case SUM:
-			return new SumFunc(begin, end);
+			return new SumFunc(topCell, bottomCell);
 		default:
 			return NULL;
 	}
 }
 
-double AvgFunc::eval() {
+double AvgFunc::eval() const {
 	size_t db = 0;
 	double sum = 0;
-	range.beginIter();
-	ExprPointer* cell;
-	while ((cell = range.next())) {
+	Range::iterator cell;
+	for (cell = range.begin(); cell != range.end(); cell++) {
 		sum += (*cell)->eval();
 		db++;
 	}
 	return sum/(double)db;
 }
 
-double SumFunc::eval() {
+double SumFunc::eval() const {
 	double sum = 0;
-	range.beginIter();
-	ExprPointer* cell;
-	while ((cell = range.next())) {
+	Range::iterator cell;
+	for (cell = range.begin(); cell != range.end(); cell++) {
 		sum += (*cell)->eval();
 	}
 	return sum;

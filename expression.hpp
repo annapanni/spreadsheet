@@ -27,29 +27,42 @@ public:
 	int getRow() const {return cell.row;}
 	Sheet* getSheet() const {return sh;}
 	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(cell.colNum, cell.row);}
-	double eval();
-	void checkCyclic(std::vector<Expression*>);
+	double eval() const;
+	void checkCyclic(std::vector<Expression*>) const;
 	std::string show() const {return cell.colLetter() + std::to_string(cell.row);}
 	CellRefExpr* copy() const {return new CellRefExpr(*this);}
 };
 
 class Range {
-	CellRefExpr* begin;
-	CellRefExpr* end;		//exprected that begin and end are on the same sheet
-	//initialized by beginIter:
-	size_t rangeWidth;
-	ExprPointer* iterRow;
-	ExprPointer* iterCell;
+	CellRefExpr* topCell;
+	CellRefExpr* bottomCell;		//expected that begin and end are on the same sheet
 public:
 	Range(CellRefExpr* bg, CellRefExpr* ed);
-	Range(const Range& r) : begin(r.begin->copy()), end(r.end->copy()) {}
+	Range(const Range& r) : topCell(r.topCell->copy()), bottomCell(r.bottomCell->copy()) {}
 	Range& operator=(const Range& r);
-	void beginIter();
-	ExprPointer* next();
-	std::string show() const {return begin->show() + ":" + end->show();}
+	class iterator {
+		size_t rangeWidth;
+		size_t tableWidth;
+		ExprPointer* actRow;
+		ExprPointer* actCell;
+	public:
+		iterator() : rangeWidth(0), tableWidth(0), actRow(NULL), actCell(NULL) {}
+		iterator(size_t rw, size_t tw, ExprPointer* bp)
+			: rangeWidth(rw), tableWidth(tw), actRow(bp), actCell(bp) {}
+		ExprPointer& operator*() const {if (actCell==NULL) throw "empty iterator"; return *actCell;}
+		ExprPointer* operator->() const {return actCell;}
+		bool operator==(const ExprPointer* ep) const {return actCell == ep;}
+		bool operator==(const iterator& it) const {return actCell == it.actCell;}
+		bool operator!=(const iterator& it) const {return actCell != it.actCell;}
+		iterator& operator++();
+		iterator operator++(int);
+	};
+	iterator begin() const;
+	iterator end() const;
+	std::string show() const {return topCell->show() + ":" + bottomCell->show();}
 	~Range(){
-		delete begin;
-		delete end;
+		delete topCell;
+		delete bottomCell;
 	}
 };
 
@@ -62,8 +75,8 @@ protected:
 	Range range;
 public:
 	FunctionExpr(Range r) : range(r) {}
-	FunctionExpr(CellRefExpr* begin, CellRefExpr* end) : range(begin, end) {}
-	void checkCyclic(std::vector<Expression*>);
+	FunctionExpr(CellRefExpr* topCell, CellRefExpr* bottomCell) : range(topCell, bottomCell) {}
+	void checkCyclic(std::vector<Expression*>) const;
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
@@ -75,8 +88,8 @@ public:
 class AvgFunc : public FunctionExpr {
 public:
 	AvgFunc(Range r) : FunctionExpr(r) {}
-	AvgFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
-	double eval();
+	AvgFunc(CellRefExpr* topCell, CellRefExpr* bottomCell) : FunctionExpr(topCell, bottomCell) {}
+	double eval() const;
 	std::string show() const {return "avg(" + range.show() + ")";}
 	Expression* copy() const {return new AvgFunc(range);}
 };
@@ -84,13 +97,13 @@ public:
 class SumFunc : public FunctionExpr {
 public:
 	SumFunc(Range r) : FunctionExpr(r) {}
-	SumFunc(CellRefExpr* begin, CellRefExpr* end) : FunctionExpr(begin, end) {}
-	double eval();
+	SumFunc(CellRefExpr* topCell, CellRefExpr* bottomCell) : FunctionExpr(topCell, bottomCell) {}
+	double eval() const;
 	std::string show() const {return "sum(" + range.show() + ")";}
 	Expression* copy() const {return new SumFunc(range);}
 };
 
-FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* begin, CellRefExpr* end);
+FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell);
 
 class Operator : public Expression {
 protected:
@@ -100,7 +113,7 @@ public:
 	Operator(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
 	Operator(const Operator& op) : lhs(op.lhs->copy()), rhs(op.rhs->copy()) {}
 	Operator& operator=(const Operator& op);
-	void checkCyclic(std::vector<Expression*> ps) {lhs->checkCyclic(ps); rhs->checkCyclic(ps);}
+	void checkCyclic(std::vector<Expression*> ps) const {lhs->checkCyclic(ps); rhs->checkCyclic(ps);}
 	virtual ~Operator(){
 		delete lhs;
 		delete rhs;
@@ -110,7 +123,7 @@ public:
 class Mult : public Operator {
 public:
 	Mult(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
-	double eval() {return lhs->eval() * rhs->eval();}
+	double eval() const {return lhs->eval() * rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "*" + rhs->show() + ")";}
 	Expression* copy() const {return new Mult(lhs->copy(), rhs->copy());}
 };
@@ -118,7 +131,7 @@ public:
 class Div : public Operator {
 public:
 	Div(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
-	double eval() {return lhs->eval() / rhs->eval();}
+	double eval() const {return lhs->eval() / rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "/" + rhs->show() + ")";}
 	Expression* copy() const {return new Div(lhs->copy(), rhs->copy());}
 };
@@ -126,7 +139,7 @@ public:
 class Add : public Operator {
 public:
 	Add(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
-	double eval() {return lhs->eval() + rhs->eval();}
+	double eval() const {return lhs->eval() + rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "+" + rhs->show() + ")";}
 	Expression* copy() const {return new Add(lhs->copy(), rhs->copy());}
 };
@@ -134,7 +147,7 @@ public:
 class Sub : public Operator {
 public:
 	Sub(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
-	double eval() {return lhs->eval() - rhs->eval();}
+	double eval() const {return lhs->eval() - rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "-" + rhs->show() + ")";}
 	Expression* copy() const {return new Sub(lhs->copy(), rhs->copy());}
 };

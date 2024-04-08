@@ -40,29 +40,31 @@ CellRefExpr* c2 = new CellRefExpr("c2", &sh);
 
 TEST (Expression, Range){
 	Range r1(a1->copy(), a1->copy());
-	r1.beginIter();
-	EXPECT_EQ(r1.next(), a1->getPtr());
-	EXPECT_EQ(r1.next(), (ExprPointer*)NULL);
+
+	Range:: iterator it = r1.begin();
+	EXPECT_EQ(it++, a1->getPtr());
+	EXPECT_EQ(it++, r1.end());
 
 	Range r2(a1->copy(), b3->copy());
 	EXPECT_EQ(r2.show(), "a1:b3");
-	r2.beginIter();
-	int db = 0;
-	while (r2.next()!=NULL) {db++;}
-	EXPECT_EQ(db, 6);
+	it = r2.begin();
 
+	int db = 0;
+	while (it++ != r2.end()) {db++;}
+	EXPECT_EQ(db, 6);
+	
 	Range r3(c2->copy(), a1->copy());
 	EXPECT_EQ(r3.show(), "a1:c2");
-	r3.beginIter();
+	it = r3.begin();
 	db = 0;
-	while (r3.next()!=NULL) {db++;}
+	while (it++ != r3.end()) {db++;}
 	EXPECT_EQ(db, 6);
 
 	Range r4(b3->copy(), c2->copy());
 	EXPECT_EQ(r4.show(), "b2:c3");
-	r4.beginIter();
+	it = r4.begin();
 	db = 0;
-	while (r4.next()) {db++;}
+	while (it++ != r4.end()) {db++;}
 	EXPECT_EQ(db, 4);
 }
 
