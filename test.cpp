@@ -31,6 +31,16 @@ TEST(Expression, CellRef){
 	EXPECT_THROW(c.checkCyclic({*(sh[2][1])}), const char*);
 	EXPECT_THROW(cc->checkCyclic({*(sh[2][1])}), const char*);
 	delete cc;
+
+	CellRefExpr cell (std::string("b2"), &sh);
+	cell.shift(1,-1);
+	EXPECT_EQ(cell.getPtr(), &(sh[0][2]));
+	cell.shift(-1, 2);
+	EXPECT_EQ(cell.getPtr(), &(sh[2][1]));
+	cell.shift(0, -1);
+	EXPECT_EQ(cell.getPtr(), &(sh[1][1]));
+	cell.shift(2, 0);
+	EXPECT_THROW(cell.getPtr(), const char*);
 }
 
 Sheet sh(3,3, 5);
@@ -41,31 +51,51 @@ CellRefExpr* c2 = new CellRefExpr("c2", &sh);
 TEST (Expression, Range){
 	Range r1(a1->copy(), a1->copy());
 
-	Range:: iterator it = r1.begin();
+	Range::iterator it = r1.begin();
 	EXPECT_EQ(it++, a1->getPtr());
 	EXPECT_EQ(it++, r1.end());
 
 	Range r2(a1->copy(), b3->copy());
 	EXPECT_EQ(r2.show(), "a1:b3");
 	it = r2.begin();
+	EXPECT_EQ(r2.getRelX(&sh[0][0]), 0);
+	EXPECT_EQ(r2.getRelY(&sh[0][0]), 0);
+	EXPECT_EQ(r2.getRelX(&sh[0][2]), 2);
+	EXPECT_EQ(r2.getRelY(&sh[0][2]), 0);
+	EXPECT_EQ(r2.getRelX(&sh[2][1]), 1);
+	EXPECT_EQ(r2.getRelY(&sh[2][1]), 2);
 
 	int db = 0;
 	while (it++ != r2.end()) {db++;}
 	EXPECT_EQ(db, 6);
-	
+
 	Range r3(c2->copy(), a1->copy());
 	EXPECT_EQ(r3.show(), "a1:c2");
 	it = r3.begin();
 	db = 0;
 	while (it++ != r3.end()) {db++;}
 	EXPECT_EQ(db, 6);
+}
 
+TEST (Expression, Range2){
 	Range r4(b3->copy(), c2->copy());
 	EXPECT_EQ(r4.show(), "b2:c3");
-	it = r4.begin();
-	db = 0;
+	Range::iterator it = r4.begin();
+	int db = 0;
 	while (it++ != r4.end()) {db++;}
 	EXPECT_EQ(db, 4);
+
+	r4.shift(-1, 0);
+	EXPECT_EQ(r4.show(), "a2:b3");
+
+	CellRefExpr* a3 = a1->copy();
+	a3->shift(0, 2);
+	Range r5(a1->copy(), a3);
+	EXPECT_EQ(r5.show(), "a1:a3");
+	it = r5.begin();
+	db = 0;
+	while (it++ != r5.end()) {db++;std::cout << db << "\n";}
+	EXPECT_EQ(db, 3);
 }
 
 TEST (Expression, Function){
@@ -76,6 +106,8 @@ TEST (Expression, Function){
 	EXPECT_NO_THROW(avg->checkCyclic({**(b3->getPtr())}));
 	EXPECT_EQ(avg->eval(), 5);
 	EXPECT_EQ(avg->show(), "avg(a1:c2)");
+	avg->shift(0, 1);
+	EXPECT_EQ(avg->show(), "avg(a2:c3)");
 	delete avg;
 	EXPECT_EQ(FunctionExpr::parseFname("avg"), AVG);
 	EXPECT_EQ(FunctionExpr::parseFname("sum"), SUM);
@@ -93,6 +125,8 @@ TEST (Expression, Mult){
 	EXPECT_EQ(opcpy->eval(), 25);
 	EXPECT_EQ(opcpy->show(), "(a1*b3)");
 	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	opcpy->shift(1, 0);
+	EXPECT_EQ(opcpy->show(), "(b1*c3)");
 	delete opcpy;
 }
 
@@ -107,6 +141,8 @@ TEST (Expression, Div){
 	EXPECT_EQ(opcpy->eval(), 1);
 	EXPECT_EQ(opcpy->show(), "(a1/b3)");
 	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	opcpy->shift(1, 0);
+	EXPECT_EQ(opcpy->show(), "(b1/c3)");
 	delete opcpy;
 }
 
@@ -121,6 +157,8 @@ TEST (Expression, Add){
 	EXPECT_EQ(opcpy->eval(), 10);
 	EXPECT_EQ(opcpy->show(), "(a1+b3)");
 	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	opcpy->shift(1, 0);
+	EXPECT_EQ(opcpy->show(), "(b1+c3)");
 	delete opcpy;
 }
 
@@ -135,6 +173,8 @@ TEST (Expression, Sub){
 	EXPECT_EQ(opcpy->eval(), 0);
 	EXPECT_EQ(opcpy->show(), "(a1-b3)");
 	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	opcpy->shift(1, 0);
+	EXPECT_EQ(opcpy->show(), "(b1-c3)");
 	delete opcpy;
 }
 

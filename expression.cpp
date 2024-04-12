@@ -72,15 +72,24 @@ Range::iterator Range::begin() const{
 	Sheet* sh = topCell->getSheet();
 	ExprPointer* bp = topCell->getPtr();
 	ExprPointer* ep = bottomCell->getPtr();
-	size_t rangeWidth = (ep - bp - 1) % (int)sh->getWidth() + 1;
+	size_t rangeWidth = (ep - bp) % (int)(sh->getWidth()); // used to be -1 +1
 	return iterator(rangeWidth, sh->getWidth(), bp);
 }
 Range::iterator Range::end() const{
 	Sheet* sh = topCell->getSheet();
 	ExprPointer* bp = topCell->getPtr();
 	ExprPointer* ep = bottomCell->getPtr();
-	size_t rangeWidth = (ep - bp - 1) % (int)sh->getWidth() + 1;
+	size_t rangeWidth = (ep - bp) % (int)sh->getWidth();  // used to be -1 +1
 	return iterator(rangeWidth, sh->getWidth(), ep-rangeWidth+sh->getWidth());
+}
+
+int Range::getRelY(ExprPointer* cell) const {
+	int twidth = (int)(topCell->getSheet()->getWidth());
+	return (int)(cell - topCell->getPtr()) / twidth;
+}
+int Range::getRelX(ExprPointer* cell) const {
+	int twidth = (int)(topCell->getSheet()->getWidth());
+	return (int)(cell - getRelY(cell)*(twidth) - topCell->getPtr());
 }
 
 void FunctionExpr::checkCyclic(std::vector<Expression*> ps) const {

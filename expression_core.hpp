@@ -13,6 +13,7 @@ public:
 	virtual double safeEval(std::vector<Expression*> ps) const {checkCyclic(ps); return eval();}
 	virtual std::string show() const = 0;
 	virtual Expression* copy() const = 0;
+	virtual void shift(int dx, int dy) = 0;
 	virtual ~Expression() {};
 };
 
@@ -44,6 +45,7 @@ public:
 	void checkCyclic(std::vector<Expression*>) const {}
 	Expression* copy() const {return new NumberExpr(value);}
 	std::string show() const {std::ostringstream ss; ss << value; return ss.str();}
+	void shift(int dx, int dy) {dx=dy; dy=dx;}
 };
 
 #endif

@@ -6,8 +6,9 @@
 void help(){
 	std::cout << "Available commands: \n\
 	\t print - print sheet \n\
-	\t set (int row) (int col) - set a given cell in sheet (indexing from 0) \n\
-	\t show (int row) (int col) - display contents of given cell (indexing from 0) \n\
+	\t set (cell) (expression) - set a given cell in sheet (indexing from 0) \n\
+	\t pull (cell) (cell) - relative copy of the expression of the first cell until the last \n\
+	\t show (cell) - display contents of given cell (indexing from 0) \n\
 	\t new (int w) (int h) - create a new sheet \n\
 	\t resize (int w) (int h) - resize current table \n\
 	\t help - display available commands \n\
@@ -53,6 +54,17 @@ int main(void) {
 			} else {
 				std::cout << "index out of range\n";
 			}
+		}  else if (command == "pull") {
+			std::string cellstr1, cellstr2;
+			std::cin >> cellstr1 >> cellstr2;
+			try {
+				CellRefExpr top = CellRefExpr(cellstr1, &sh);
+				Range range(new CellRefExpr(cellstr1, &sh), new CellRefExpr(cellstr2, &sh));
+				for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
+					*cell = (*top.getPtr())->copy();
+					(*cell)->shift(range.getRelX(&*cell), range.getRelY(&*cell));
+				}
+			} catch (const char* msg) {std::cout << msg;}
 		} else if (command == "new") {
 			size_t w, h;
 			std::cin >> w >> h;
