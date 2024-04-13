@@ -2,13 +2,13 @@ CXX = g++
 CXXFLAGS = -Werror -Wall -Wextra -Wpedantic -Wconversion -fsanitize=address
 GTTESTFLAGS = -lgtest -lgtest_main
 
-SRCS = token.cpp expression.cpp sheet.cpp parser.cpp
+SRCS = srcs/token.cpp srcs/expression.cpp srcs/sheet.cpp srcs/parser.cpp
 OBJS = $(SRCS:.cpp=.o)
 
-SRCS1 = test.cpp
+SRCS1 = srcs/test.cpp
 OBJS1 = $(OBJS) $(SRCS1:.cpp=.o)
 
-SRCS2 = ui.cpp
+SRCS2 = srcs/ui.cpp
 OBJS2 = $(OBJS) $(SRCS2:.cpp=.o)
 PROG2 = console
 

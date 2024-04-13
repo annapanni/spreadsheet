@@ -4,7 +4,7 @@ unary          → "-" unary
                | function
                | primary;
 function       → STRING "(" cell ":" cell ")" ;
-cell           → ('$')? STRING ('$')? NUMBER
+cell           → ('$')? STRING ('$' NUMBER)?
 primary        → NUMBER | "(" expression ")" | cell;
 
 
