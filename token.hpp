@@ -6,7 +6,7 @@
 
 enum Token_type {
 	MINUS, PLUS, SLASH, STAR, LEFT_BR, RIGHT_BR, COLON,
-	NUMBER, STRING
+	DOLLAR, NUMBER, STRING
 };
 
 class Token {

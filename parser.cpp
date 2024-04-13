@@ -183,11 +183,26 @@ Expression* Parser::primary(Sheet* shp){
 
 CellRefExpr* Parser::cell(Sheet* shp){
 	CellRefExpr* expr = NULL;
-	if(match(STRING)){
+	bool absCol = false;
+	if (match(DOLLAR))
+		absCol = true;
+	std::string colstr;
+	if (match(STRING)) {
 		try	{
-			std::string cellstr = dynamic_cast<DataToken<std::string>*>(prev())->getContent();
-			return new CellRefExpr(cellstr, shp);
+			colstr = dynamic_cast<DataToken<std::string>*>(prev())->getContent();
 		} catch (const std::bad_cast& bc) {throw "tokenization error\n";}
+	}
+	if (match(DOLLAR)) {//col and row are separated, row is absolute
+		if (match(NUMBER)) {
+			try	{
+				int n = (int)dynamic_cast<DataToken<double>*>(prev())->getContent();
+				return new CellRefExpr(colstr, n, shp, absCol, true);
+			} catch (const std::bad_cast& bc) {throw "tokenization error\n";}
+		} else {
+			throw "invalid syntax\n";
+		}
+	} else {//row isn't absolute
+		return new CellRefExpr(colstr, shp, absCol, false);
 	}
 	return expr;
 }

@@ -18,6 +18,8 @@ std::string Token::show() {
 			return "colon";
 		case NUMBER:
 			return "number";
+		case DOLLAR:
+			return "dollar";
 		default:
 			return "string";
 	}
@@ -39,6 +41,8 @@ Token_type Token::parseTokenType(char c){
 			return RIGHT_BR;
 		case ':':
 			return COLON;
+		case '$':
+			return DOLLAR;
 		default:
 			return STRING;
 	}

@@ -27,17 +27,28 @@ void CellRefExpr::checkCyclic(std::vector<Expression*> ps) const {
 	(*getPtr())->checkCyclic(ps);
 }
 
+void CellRefExpr::shift(int dx, int dy) {
+	if (!absRow)
+		cell.row += dy;
+	if (!absCol)
+	  cell.colNum += dx;
+}
+
 Range::Range(CellRefExpr* bg, CellRefExpr* ed) {
 	std::string bgCol = bg->getCol();
 	std::string edCol = ed->getCol();
 	int bgRow = bg->getRow();
 	int edRow = ed->getRow();
 	std::string minCol = bgCol < edCol ? bgCol : edCol;
+	bool minColAbs = bgCol < edCol ? bg->getAbsCol() : ed->getAbsCol();
 	std::string maxCol = bgCol > edCol ? bgCol : edCol;
+	bool maxColAbs = bgCol > edCol ? bg->getAbsCol() : ed->getAbsCol();
 	int minRow = bgRow < edRow ? bgRow : edRow;
+	bool minRowAbs = bgRow < edRow ? bg->getAbsRow() : ed->getAbsRow();
 	int maxRow = bgRow > edRow ? bgRow : edRow;
-	topCell = new CellRefExpr(minCol, minRow, bg->getSheet());
-	bottomCell = new CellRefExpr(maxCol, maxRow, bg->getSheet()); //assuming both cells are on the same sheet
+	bool maxRowAbs = bgRow > edRow ? bg->getAbsRow() : ed->getAbsRow();
+	topCell = new CellRefExpr(minCol, minRow, bg->getSheet(), minColAbs, minRowAbs);
+	bottomCell = new CellRefExpr(maxCol, maxRow, bg->getSheet(), maxColAbs, maxRowAbs); //assuming both cells are on the same sheet
 	delete bg;
 	delete ed;
 }

@@ -20,18 +20,24 @@ public:
 class CellRefExpr : public Expression {
 	CellId cell;
 	Sheet* sh;
+	bool absCol;
+	bool absRow;
 public:
-	CellRefExpr(std::string col, int row, Sheet* sh = NULL) : cell(CellId(col, row)), sh(sh) {}
-	CellRefExpr(std::string str, Sheet* sh = NULL) : cell(CellId(str)), sh(sh) {}
+	CellRefExpr(std::string col, int row, Sheet* sh = NULL, bool absCol=false, bool absRow=false)
+		: cell(CellId(col, row)), sh(sh), absCol(absCol), absRow(absRow) {}
+	CellRefExpr(std::string str, Sheet* sh = NULL, bool absCol=false, bool absRow=false)
+		: cell(CellId(str)), sh(sh), absCol(absCol), absRow(absRow) {}
 	std::string getCol() const {return cell.colLetter();}
 	int getRow() const {return cell.row;}
 	Sheet* getSheet() const {return sh;}
 	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(cell.colNum, cell.row);}
+	bool getAbsCol() const {return absCol;}
+	bool getAbsRow() const {return absRow;}
 	double eval() const;
 	void checkCyclic(std::vector<Expression*>) const;
-	std::string show() const {return cell.colLetter() + std::to_string(cell.row);}
+	std::string show() const {return (absCol?"$":"") + cell.colLetter() + (absRow?"$":"") + std::to_string(cell.row);}
 	CellRefExpr* copy() const {return new CellRefExpr(*this);}
-	void shift(int dx, int dy) {cell.row += dy; cell.colNum += dx;}
+	void shift(int dx, int dy);
 };
 
 class Range {

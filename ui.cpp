@@ -64,7 +64,7 @@ int main(void) {
 				Range range(new CellRefExpr(cellstr1, &sh), new CellRefExpr(cellstr2, &sh));
 				for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
 					*cell = (*start.getPtr())->copy();
-					(*cell)->shift(sx-sh.getXCoord(&*cell), sy-sh.getYCoord(&*cell));
+					(*cell)->shift(sh.getXCoord(&*cell)-sx, sh.getYCoord(&*cell)-sy);
 				}
 			} catch (const char* msg) {std::cout << msg;}
 		} else if (command == "new") {
