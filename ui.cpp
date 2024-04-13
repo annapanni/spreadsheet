@@ -5,12 +5,12 @@
 
 void help(){
 	std::cout << "Available commands: \n\
+	\t new [int w] [int h] - create a new sheet \n\
+	\t resize [int w] [int h] - resize current table \n\
 	\t print - print sheet \n\
-	\t set (cell) (expression) - set a given cell in sheet (indexing from 0) \n\
-	\t pull (cell) (cell) - relative copy of the expression of the first cell until the last \n\
-	\t show (cell) - display contents of given cell (indexing from 0) \n\
-	\t new (int w) (int h) - create a new sheet \n\
-	\t resize (int w) (int h) - resize current table \n\
+	\t set [cell] [expression] - set a given cell in sheet \n\
+	\t pull [cell] [cell] - relative copy of the expression of the first cell until the last \n\
+	\t show [cell] - display contents of given cell \n\
 	\t help - display available commands \n\
 	\t exit - close program\n";
 }
