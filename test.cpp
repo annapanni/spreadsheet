@@ -257,6 +257,9 @@ TEST (Parser, parsing){
 	expr = Parser("a1+ sdf345* (234 +sum(c4:d34) )*2").parse();
 	EXPECT_EQ(expr->show(), "(a1+((sdf345*(234+sum(c4:d34)))*2))");
 	delete expr;
+	expr = Parser("$a1+ $sdf$345* (234 +sum($c4:d$34) )*2").parse();
+	EXPECT_EQ(expr->show(), "($a1+(($sdf$345*(234+sum($c4:d$34)))*2))");
+	delete expr;
 	Sheet sh(2,3,3);
 	Parser("34+b2").parseTo(&sh, sh[0][0]);
 	EXPECT_EQ(sh[0][0]->show(), "(34+b2)");
@@ -266,10 +269,16 @@ TEST (Parser, parsing){
 TEST (Parser, parsingErrors){
 	EXPECT_THROW(Parser("").parseThrow(), const char*);
 	EXPECT_THROW(Parser("a").parseThrow(), const char*);
+	EXPECT_THROW(Parser("$a").parseThrow(), const char*);
+	EXPECT_THROW(Parser("a$").parseThrow(), const char*);
+	EXPECT_THROW(Parser("$a$").parseThrow(), const char*);
+	EXPECT_THROW(Parser("$1").parseThrow(), const char*);
+	EXPECT_THROW(Parser("$1$").parseThrow(), const char*);
 	EXPECT_THROW(Parser("34+").parseThrow(), const char*);
 	EXPECT_THROW(Parser("/234").parseThrow(), const char*);
 	EXPECT_THROW(Parser("32+34*").parseThrow(), const char*);
 	EXPECT_THROW(Parser("hah(a1:b2)").parseThrow(), const char*);
+	EXPECT_THROW(Parser("sum($a1:b$)").parseThrow(), const char*);
 	EXPECT_THROW(Parser("sum(a1)").parseThrow(), const char*);
 	EXPECT_THROW(Parser("sum(a1:)").parseThrow(), const char*);
 	EXPECT_THROW(Parser("sum(a1:b2").parseThrow(), const char*);
