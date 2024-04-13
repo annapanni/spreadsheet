@@ -62,8 +62,6 @@ public:
 	iterator end() const;
 	std::string show() const {return topCell->show() + ":" + bottomCell->show();}
 	void shift(int dx, int dy) {topCell->shift(dx, dy); bottomCell->shift(dx, dy);}
-	int getRelX(ExprPointer* cell) const;
-	int getRelY(ExprPointer* cell) const;
 	~Range(){
 		delete topCell;
 		delete bottomCell;

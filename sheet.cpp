@@ -60,6 +60,13 @@ ExprPointer* Sheet::parseCell(std::string col, int row) const {
 	return parseCell(cn, row);
 }
 
+int Sheet::getYCoord(ExprPointer* cell) const {
+	return (int)(cell - table) / (int)width;
+}
+int Sheet::getXCoord(ExprPointer* cell) const {
+	return (int)(cell - getYCoord(cell)*(int)width - table);
+}
+
 void Sheet::copyTo(Sheet& sh) const {
 	size_t minw = sh.width < width ? sh.width : width;
 	size_t minh = sh.height < height ? sh.height : height;

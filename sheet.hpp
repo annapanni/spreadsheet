@@ -30,6 +30,9 @@ public:
 	bool checkRow(int r) const {return r <= (int)height && r > 0;}
 	bool checkCol(int col) const {return col <= (int)width && col > 0;}
 
+	int getYCoord(ExprPointer* cell) const;
+	int getXCoord(ExprPointer* cell) const;
+
 	void copyTo(Sheet& sh) const;
 	void resize(size_t w, size_t h, double fill = 0);
 

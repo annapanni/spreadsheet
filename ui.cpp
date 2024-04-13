@@ -58,11 +58,13 @@ int main(void) {
 			std::string cellstr1, cellstr2;
 			std::cin >> cellstr1 >> cellstr2;
 			try {
-				CellRefExpr top = CellRefExpr(cellstr1, &sh);
+				CellRefExpr start = CellRefExpr(cellstr1, &sh);
+				int sx = sh.getXCoord(start.getPtr());
+				int sy = sh.getYCoord(start.getPtr());
 				Range range(new CellRefExpr(cellstr1, &sh), new CellRefExpr(cellstr2, &sh));
 				for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
-					*cell = (*top.getPtr())->copy();
-					(*cell)->shift(range.getRelX(&*cell), range.getRelY(&*cell));
+					*cell = (*start.getPtr())->copy();
+					(*cell)->shift(sx-sh.getXCoord(&*cell), sy-sh.getYCoord(&*cell));
 				}
 			} catch (const char* msg) {std::cout << msg;}
 		} else if (command == "new") {

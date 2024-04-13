@@ -58,12 +58,6 @@ TEST (Expression, Range){
 	Range r2(a1->copy(), b3->copy());
 	EXPECT_EQ(r2.show(), "a1:b3");
 	it = r2.begin();
-	EXPECT_EQ(r2.getRelX(&sh[0][0]), 0);
-	EXPECT_EQ(r2.getRelY(&sh[0][0]), 0);
-	EXPECT_EQ(r2.getRelX(&sh[0][2]), 2);
-	EXPECT_EQ(r2.getRelY(&sh[0][2]), 0);
-	EXPECT_EQ(r2.getRelX(&sh[2][1]), 1);
-	EXPECT_EQ(r2.getRelY(&sh[2][1]), 2);
 
 	int db = 0;
 	while (it++ != r2.end()) {db++;}
@@ -94,7 +88,7 @@ TEST (Expression, Range2){
 	EXPECT_EQ(r5.show(), "a1:a3");
 	it = r5.begin();
 	db = 0;
-	while (it++ != r5.end()) {db++;std::cout << db << "\n";}
+	while (it++ != r5.end()) {db++;}
 	EXPECT_EQ(db, 3);
 }
 
@@ -203,6 +197,13 @@ TEST (Sheet, constrAndGetters){
 	}
 	EXPECT_EQ(sh2[0][1]->eval(), 3);
 	EXPECT_EQ(sh2[0][0]->eval(), 7);
+
+	EXPECT_EQ(sh2.getXCoord(&sh2[0][0]), 0);
+	EXPECT_EQ(sh2.getYCoord(&sh2[0][0]), 0);
+	EXPECT_EQ(sh2.getXCoord(&sh2[0][2]), 2);
+	EXPECT_EQ(sh2.getYCoord(&sh2[0][2]), 0);
+	EXPECT_EQ(sh2.getXCoord(&sh2[2][1]), 1);
+	EXPECT_EQ(sh2.getYCoord(&sh2[2][1]), 2);
 }
 
 TEST (Sheet, functions){
