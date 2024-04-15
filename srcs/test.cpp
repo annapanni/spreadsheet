@@ -28,8 +28,8 @@ TEST(Expression, CellRef){
 	Expression* cc = c.copy();
 	EXPECT_EQ(cc->show(), "b3");
 	EXPECT_NO_THROW(c.checkCyclic({cc}));
-	EXPECT_THROW(c.checkCyclic({*(sh[2][1])}), const char*);
-	EXPECT_THROW(cc->checkCyclic({*(sh[2][1])}), const char*);
+	EXPECT_THROW(c.checkCyclic({(Expression*)sh[2][1]}), const char*);
+	EXPECT_THROW(cc->checkCyclic({(Expression*)sh[2][1]}), const char*);
 	delete cc;
 
 	CellRefExpr cell (std::string("b2"), &sh);
@@ -94,10 +94,10 @@ TEST (Expression, Range2){
 
 TEST (Expression, Function){
 	SumFunc sum = SumFunc(a1->copy(), b3->copy());
-	EXPECT_THROW(sum.checkCyclic({**(a1->getPtr()+1)}), const char*);
+	EXPECT_THROW(sum.checkCyclic({(Expression*)*(a1->getPtr()+1)}), const char*);
 	EXPECT_EQ(sum.eval(), 30);
 	FunctionExpr* avg = newFunctionExpr(AVG, c2->copy(), a1->copy());
-	EXPECT_NO_THROW(avg->checkCyclic({**(b3->getPtr())}));
+	EXPECT_NO_THROW(avg->checkCyclic({(Expression*)*(b3->getPtr())}));
 	EXPECT_EQ(avg->eval(), 5);
 	EXPECT_EQ(avg->show(), "avg(a1:c2)");
 	avg->shift(0, 1);
@@ -118,7 +118,7 @@ TEST (Expression, Mult){
 	}
 	EXPECT_EQ(opcpy->eval(), 25);
 	EXPECT_EQ(opcpy->show(), "(a1*b3)");
-	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1*c3)");
 	delete opcpy;
@@ -134,7 +134,7 @@ TEST (Expression, Div){
 	}
 	EXPECT_EQ(opcpy->eval(), 1);
 	EXPECT_EQ(opcpy->show(), "(a1/b3)");
-	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1/c3)");
 	delete opcpy;
@@ -150,7 +150,7 @@ TEST (Expression, Add){
 	}
 	EXPECT_EQ(opcpy->eval(), 10);
 	EXPECT_EQ(opcpy->show(), "(a1+b3)");
-	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1+c3)");
 	delete opcpy;
@@ -166,7 +166,7 @@ TEST (Expression, Sub){
 	}
 	EXPECT_EQ(opcpy->eval(), 0);
 	EXPECT_EQ(opcpy->show(), "(a1-b3)");
-	EXPECT_THROW(opcpy->checkCyclic({**(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1-c3)");
 	delete opcpy;

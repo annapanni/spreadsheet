@@ -23,7 +23,7 @@ void CellRefExpr::checkCyclic(std::vector<Expression*> ps) const {
 			throw "cyclic reference\n";
 		}
 	}
-	ps.push_back(**getPtr());
+	ps.push_back((Expression*)*getPtr());
 	(*getPtr())->checkCyclic(ps);
 }
 
@@ -102,7 +102,7 @@ void FunctionExpr::checkCyclic(std::vector<Expression*> ps) const {
 				throw "cyclic reference\n";
 			}
 		}
-		ps.push_back(**cell);
+		ps.push_back((Expression*)*cell);
 		(*cell)->checkCyclic(ps);
 		ps.pop_back();
 	}

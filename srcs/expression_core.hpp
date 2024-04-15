@@ -22,7 +22,7 @@ class ExprPointer {
 public:
 	ExprPointer(Expression* p = NULL) : ep(p) {}
 	ExprPointer(const ExprPointer& rhs) : ep(rhs.ep->copy()) {}
-	Expression* operator*() const {return ep;}
+	operator Expression*() const {return ep;}
 	ExprPointer& operator=(const ExprPointer& rhs) {
 		if (&rhs != this) {
 			delete ep;
