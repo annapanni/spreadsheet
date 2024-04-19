@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 #include <string>
+#include <sstream>
 
 #include "expression.hpp"
 #include "sheet.hpp"
 #include "parser.hpp"
+#include "console.hpp"
 
 TEST(Expression, Number){
 	NumberExpr n (3);
@@ -260,6 +262,9 @@ TEST (Parser, parsing){
 	expr = Parser("$a1+ $sdf$345* (234 +sum($c4:d$34) )*2").parse();
 	EXPECT_EQ(expr->show(), "($a1+(($sdf$345*(234+sum($c4:d$34)))*2))");
 	delete expr;
+	expr = Parser("a$1+ $sdf$345* (234 +sum($c4:c$4) )*$d$4").parse();
+	EXPECT_EQ(expr->show(), "(a$1+(($sdf$345*(234+sum($c4:c$4)))*$d$4))");
+	delete expr;
 	Sheet sh(2,3,3);
 	Parser("34+b2").parseTo(&sh, sh[0][0]);
 	EXPECT_EQ(sh[0][0]->show(), "(34+b2)");
@@ -267,22 +272,23 @@ TEST (Parser, parsing){
 }
 
 TEST (Parser, parsingErrors){
-	EXPECT_THROW(Parser("").parseThrow(), const char*);
-	EXPECT_THROW(Parser("a").parseThrow(), const char*);
-	EXPECT_THROW(Parser("$a").parseThrow(), const char*);
-	EXPECT_THROW(Parser("a$").parseThrow(), const char*);
-	EXPECT_THROW(Parser("$a$").parseThrow(), const char*);
-	EXPECT_THROW(Parser("$1").parseThrow(), const char*);
-	EXPECT_THROW(Parser("$1$").parseThrow(), const char*);
-	EXPECT_THROW(Parser("34+").parseThrow(), const char*);
-	EXPECT_THROW(Parser("/234").parseThrow(), const char*);
-	EXPECT_THROW(Parser("32+34*").parseThrow(), const char*);
-	EXPECT_THROW(Parser("hah(a1:b2)").parseThrow(), const char*);
-	EXPECT_THROW(Parser("sum($a1:b$)").parseThrow(), const char*);
-	EXPECT_THROW(Parser("sum(a1)").parseThrow(), const char*);
-	EXPECT_THROW(Parser("sum(a1:)").parseThrow(), const char*);
-	EXPECT_THROW(Parser("sum(a1:b2").parseThrow(), const char*);
-	EXPECT_THROW(Parser("12* 34 + ((12 +1)").parseThrow(), const char*);
+	EXPECT_THROW(Parser("").parse(), const char*);
+	EXPECT_THROW(Parser("a").parse(), const char*);
+	EXPECT_THROW(Parser("a1s").parse(), const char*);
+	EXPECT_THROW(Parser("$a").parse(), const char*);
+	EXPECT_THROW(Parser("a$").parse(), const char*);
+	EXPECT_THROW(Parser("$a$").parse(), const char*);
+	EXPECT_THROW(Parser("$1").parse(), const char*);
+	EXPECT_THROW(Parser("$1$").parse(), const char*);
+	EXPECT_THROW(Parser("34+").parse(), const char*);
+	EXPECT_THROW(Parser("/234").parse(), const char*);
+	EXPECT_THROW(Parser("32+34*").parse(), const char*);
+	EXPECT_THROW(Parser("hah(a1:b2)").parse(), const char*);
+	EXPECT_THROW(Parser("sum($a1:b$)").parse(), const char*);
+	EXPECT_THROW(Parser("sum(a1)").parse(), const char*);
+	EXPECT_THROW(Parser("sum(a1:)").parse(), const char*);
+	EXPECT_THROW(Parser("sum(a1:b2").parse(), const char*);
+	EXPECT_THROW(Parser("12* 34 + ((12 +1)").parse(), const char*);
 }
 
 TEST (Parser, evalErrors){
@@ -297,6 +303,57 @@ TEST (Parser, evalErrors){
 	EXPECT_THROW(sh[0][0].evalMe(), const char*);
 	Parser("a10").parseTo(&sh, sh[0][0]);
 	EXPECT_THROW(sh[0][0].evalMe(), const char*);
+}
+
+TEST (Console, functions){
+	std::stringstream oss, iss;
+	Console con(oss, iss);
+	iss << "10 10 "; con.createNew();
+	iss << "a1 1 "; con.set();
+	iss << "b1 a1/2 "; con.set();
+	iss << "a2 a1+2 "; con.set();
+	iss << "a2 b10 "; con.pull();
+	iss << "b10 "; con.show();
+	EXPECT_EQ(oss.str(), "(b9+2) = 18.5\n");
+	oss.str("");
+	iss << "a1 4 "; con.set();
+	iss << "b10 "; con.show();
+	EXPECT_EQ(oss.str(), "(b9+2) = 20\n");
+	oss.str("");
+	iss << "d1 sum($a$1:a2) "; con.set();
+	iss << "d1 e10 "; con.pull();
+	iss << "d1 "; con.show();
+	iss << "e9 "; con.show();
+	iss << "e10 "; con.show();
+	EXPECT_EQ(oss.str(),
+		"sum($a$1:a2) = 10\nsum($a$1:b10) = 240\nsum($a$1:b11) = index out of range\n");
+	oss.str("");
+	con.exit();
+	EXPECT_EQ(con.isClosed(), true);
+}
+
+TEST (Console, readCommand){
+	std::stringstream oss, iss;
+	Console con(oss, iss);
+	iss << "new 5 5 set a1 3 set b1 4 show a1 show b1 ";
+	for (int i = 0; i < 5; i++) {con.readCommand();}
+	EXPECT_EQ(oss.str(), "3 = 3\n4 = 4\n");
+	oss.str("");
+
+	iss  << "set a2 sum(a1:b2) show a2 ";
+	for (int i = 0; i < 2; i++) {con.readCommand();}
+	EXPECT_EQ(oss.str(), "sum(a1:b2) = cyclic reference\n");
+	oss.str("");
+
+	iss  << "pull a1 b1 show b1 ";
+	for (int i = 0; i < 2; i++) {con.readCommand();}
+	EXPECT_EQ(oss.str(), "3 = 3\n");
+	oss.str("");
+
+	iss  << "resize 1 1 print";
+	for (int i = 0; i < 2; i++) {con.readCommand();}
+	EXPECT_EQ(oss.str(), "  a\t\n1|3\t\n");
+	oss.str("");
 }
 
 TEST (Deleting, deleting){

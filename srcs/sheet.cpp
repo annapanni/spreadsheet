@@ -83,25 +83,25 @@ void Sheet::resize(size_t w, size_t h, double fill){
 	*this = sh;
 }
 
-void Sheet::print() const {
+void Sheet::print(std::ostream& os) const {
 	if (height == 0 || width == 0) {
-		std::cout << "Sheet doesn't exists" << std::endl;
+		os << "Sheet doesn't exists" << std::endl;
 		return;
 	}
-	std::cout << std::setw((int)std::log10(height)+2) << std::setfill(' ') << ' ';
+	os << std::setw((int)std::log10(height)+2) << std::setfill(' ') << ' ';
 	for (int col = 0; col < (int)width; col++) {
-		std::cout << colLetter(col+1) << "\t";
+		os << colLetter(col+1) << "\t";
 	}
-	std::cout << std::endl;
+	os << std::endl;
 	for (int row = 0; row < (int)height; row++) {
-		std::cout << std::setw((int)std::log10(height)+1) << row+1 << "|";
+		os << std::setw((int)std::log10(height)+1) << row+1 << "|";
 		for (int col = 0; col < (int)width; col++) {
 			try {
-				std::cout << table[row*width + col].evalMe() << "\t";
+				os << table[row*width + col].evalMe() << "\t";
 			} catch (const char* msg){
-				std::cout << "#ERR" << "\t";
+				os << "#ERR" << "\t";
 			}
 		}
-		std::cout << std::endl;
+		os << std::endl;
 	}
 }

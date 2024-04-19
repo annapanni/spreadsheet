@@ -207,12 +207,12 @@ CellRefExpr* Parser::cell(Sheet* shp){
 	return expr;
 }
 
-Expression* Parser::parseThrow(Sheet* shp){
+Expression* Parser::parse(Sheet* shp){
 	current = 0;
 	return expression(shp);
 }
 
-Expression* Parser::parse(Sheet* shp){
+Expression* Parser::parseNoThrow(Sheet* shp){
 	current = 0;
 	Expression* expr = NULL;
 	try {

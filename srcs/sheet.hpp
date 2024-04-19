@@ -36,7 +36,7 @@ public:
 	void copyTo(Sheet& sh) const;
 	void resize(size_t w, size_t h, double fill = 0);
 
-	void print() const;
+	void print(std::ostream& os = std::cout) const;
 
 	~Sheet(){delete[] table;}
 };

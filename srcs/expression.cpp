@@ -39,12 +39,12 @@ Range::Range(CellRefExpr* bg, CellRefExpr* ed) {
 	std::string edCol = ed->getCol();
 	int bgRow = bg->getRow();
 	int edRow = ed->getRow();
-	std::string minCol = bgCol < edCol ? bgCol : edCol;
-	bool minColAbs = bgCol < edCol ? bg->getAbsCol() : ed->getAbsCol();
+	std::string minCol = bgCol <= edCol ? bgCol : edCol;
+	bool minColAbs = bgCol <= edCol ? bg->getAbsCol() : ed->getAbsCol();
 	std::string maxCol = bgCol > edCol ? bgCol : edCol;
 	bool maxColAbs = bgCol > edCol ? bg->getAbsCol() : ed->getAbsCol();
-	int minRow = bgRow < edRow ? bgRow : edRow;
-	bool minRowAbs = bgRow < edRow ? bg->getAbsRow() : ed->getAbsRow();
+	int minRow = bgRow <= edRow ? bgRow : edRow;
+	bool minRowAbs = bgRow <= edRow ? bg->getAbsRow() : ed->getAbsRow();
 	int maxRow = bgRow > edRow ? bgRow : edRow;
 	bool maxRowAbs = bgRow > edRow ? bg->getAbsRow() : ed->getAbsRow();
 	topCell = new CellRefExpr(minCol, minRow, bg->getSheet(), minColAbs, minRowAbs);
