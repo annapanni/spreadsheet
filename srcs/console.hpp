@@ -2,6 +2,7 @@
 #define CONSOLE_HPP
 
 #include <iostream>
+#include <fstream>
 #include "parser.hpp"
 #include "sheet.hpp"
 #include <string>
@@ -22,7 +23,10 @@ public:
 
 	void createNew();
 	void resize();
-	void print() {sh.print(os);}
+	void print() {sh.formattedPrint(os);}
+	void exportValues();
+	void save();
+	void load();
 	void set();
 	void pull();
 	void show();

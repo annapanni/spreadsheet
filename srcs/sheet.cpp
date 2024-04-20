@@ -83,7 +83,7 @@ void Sheet::resize(size_t w, size_t h, double fill){
 	*this = sh;
 }
 
-void Sheet::print(std::ostream& os) const {
+void Sheet::formattedPrint(std::ostream& os) const {
 	if (height == 0 || width == 0) {
 		os << "Sheet doesn't exists" << std::endl;
 		return;
@@ -101,6 +101,28 @@ void Sheet::print(std::ostream& os) const {
 			} catch (const char* msg){
 				os << "#ERR" << "\t";
 			}
+		}
+		os << std::endl;
+	}
+}
+
+void Sheet::printValues(std::ostream& os) const {
+	for (int row = 0; row < (int)height; row++) {
+		for (int col = 0; col < (int)width; col++) {
+			try {
+				os << table[row*width + col].evalMe() << ",";
+			} catch (const char* msg){
+				os << "#ERR" << ",";
+			}
+		}
+		os << std::endl;
+	}
+}
+
+void Sheet::printExpr(std::ostream& os) const {
+	for (int row = 0; row < (int)height; row++) {
+		for (int col = 0; col < (int)width; col++) {
+			os << table[row*width + col]->show() << ",";
 		}
 		os << std::endl;
 	}

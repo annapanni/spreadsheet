@@ -8,6 +8,9 @@ void Console::help(){
 	\t set [cell] [expression] - set a given cell in sheet \n\
 	\t pull [cell] [cell] - relative copy of the expression of the first cell until the last \n\
 	\t show [cell] - display contents of given cell \n\
+	\t export [filename] - exports the values of the sheet in csv format (extension added automatically) \n\
+	\t save [filename] - saves the expressions in the sheet in csv format (extension added automatically) \n\
+	\t load [filename] - loads sheet from csv file (extension added automatically) \n\
 	\t help - display available commands \n\
 	\t exit - close program\n";
 }
@@ -22,6 +25,35 @@ void Console::resize() {
 	size_t w, h;
 	is >> w >> h;
 	sh.resize(w, h);
+}
+
+void Console::exportValues() {
+	std::ofstream of;
+	try	{
+		std::string fname;
+		is >> fname;
+		of.open(fname + ".csv");
+		sh.printValues(of);
+	} catch (...){
+		os << "Export failed\n";
+	}
+	of.close();
+}
+void Console::save() {
+	std::ofstream of;
+	try	{
+		std::string fname;
+		is >> fname;
+		of.open(fname + ".csv");
+		sh.printExpr(of);
+	} catch (...){
+		os << "Export failed\n";
+	}
+	of.close();
+}
+
+void Console::load() {
+	os << "To be implemented\n";
 }
 
 void Console::set() {
@@ -81,6 +113,12 @@ void Console::readCommand(){
 		pull();
 	} else if (command == "new") {
 		createNew();
+	} else if (command == "load") {
+		load();
+	} else if (command == "save") {
+		save();
+	} else if (command == "export") {
+		exportValues();
 	} else if (command == "resize") {
 		resize();
 	} else if (command == "help") {
