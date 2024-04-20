@@ -71,20 +71,18 @@ void Console::load() {
 	try	{ifile.open(fname + ".csv");}
 	catch (...) {os << "Load failed\n"; return;}
 	Sheet newsh(w, h, 0);
-	int row = 0, col = 0;
-	while (getline(ifile, line)) {
+	int row = 0;
+	while (getline(ifile, line) && row < h) {
+		int col = 0;
 		std::stringstream linestream(line);
-		while (getline(linestream, word, ',')) {
-			if (col >= w) {os << "incorrent file format\n"; return;}
+		while (getline(linestream, word, ',') && col < w) {
 			try {Parser(word).parseTo(&newsh, newsh[row][col]);}
 			catch (const char*) {}
 			col++;
 		}
 		row++;
-		col = 0;
 	}
 	ifile.close();
-	newsh.formattedPrint();
 	sh = newsh;
 }
 
