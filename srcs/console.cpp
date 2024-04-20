@@ -61,7 +61,6 @@ void Console::load() {
 	catch (...) {os << "Load failed\n"; return;}
 	//counting lines
 	std::string line, word;
-
 	if (getline(ifile, line)) h++;
 	std::stringstream linestream(line);
 	while (getline(linestream, word, ',')) {w++;}

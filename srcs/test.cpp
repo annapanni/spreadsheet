@@ -364,6 +364,35 @@ TEST (Console, readCommand){
 	oss.str("");
 }
 
+TEST (Console, fileManagement){
+	std::stringstream oss1, iss1, oss2, iss2;
+	Console con1(oss1, iss1);
+	Console con2(oss2, iss2);
+	iss1 << "3 10 "; con1.createNew();
+	iss1 << "a1 1 "; con1.set();
+	iss1 << "b1 a1/2 "; con1.set();
+	iss1 << "a2 a1+2 "; con1.set();
+	iss1 << "a2 b10 "; con1.pull();
+	iss1 << "file_test "; con1.save();
+	iss2 << "file_test "; con2.load();
+	con2.print();
+	con1.print();
+	EXPECT_EQ(oss1.str(), oss2.str());
+	iss1 << "b4 "; con1.show();
+	iss2 << "b4 "; con2.show();
+	EXPECT_EQ(oss1.str(), oss2.str());
+	oss1.str("");
+	oss2.str("");
+	iss1 << "file_test "; con1.exportValues();
+	iss2 << "file_test "; con2.load();
+	con2.print();
+	con1.print();
+	EXPECT_EQ(oss1.str(), oss2.str());
+	iss1 << "b4 "; con1.show();
+	iss2 << "b4 "; con2.show();
+	EXPECT_NE(oss1.str(), oss2.str());
+}
+
 TEST (Deleting, deleting){
 	delete a1;
 	delete b3;
