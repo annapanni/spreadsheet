@@ -1,6 +1,6 @@
 #include "token.hpp"
 
-std::string Token::show() {
+std::string Token::show() const {
 	switch (type) {
 		case MINUS:
 			return "minus";

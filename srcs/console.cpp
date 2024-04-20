@@ -53,7 +53,39 @@ void Console::save() {
 }
 
 void Console::load() {
-	os << "To be implemented\n";
+	std::ifstream ifile;
+	std::string fname;
+	int w = 0, h = 0;
+	is >> fname;
+	try	{ifile.open(fname + ".csv");}
+	catch (...) {os << "Load failed\n"; return;}
+	//counting lines
+	std::string line, word;
+
+	if (getline(ifile, line)) h++;
+	std::stringstream linestream(line);
+	while (getline(linestream, word, ',')) {w++;}
+	while (getline(ifile, line)) {h++;}
+	ifile.close();
+	//opening file again
+	try	{ifile.open(fname + ".csv");}
+	catch (...) {os << "Load failed\n"; return;}
+	Sheet newsh(w, h, 0);
+	int row = 0, col = 0;
+	while (getline(ifile, line)) {
+		std::stringstream linestream(line);
+		while (getline(linestream, word, ',')) {
+			if (col >= w) {os << "incorrent file format\n"; return;}
+			try {Parser(word).parseTo(&newsh, newsh[row][col]);}
+			catch (const char*) {}
+			col++;
+		}
+		row++;
+		col = 0;
+	}
+	ifile.close();
+	newsh.formattedPrint();
+	sh = newsh;
 }
 
 void Console::set() {

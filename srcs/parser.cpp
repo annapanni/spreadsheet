@@ -212,17 +212,6 @@ Expression* Parser::parse(Sheet* shp){
 	return expression(shp);
 }
 
-Expression* Parser::parseNoThrow(Sheet* shp){
-	current = 0;
-	Expression* expr = NULL;
-	try {
-		expr = expression(shp);
-	} catch (const char* msg) {
-		std::cout << msg;
-	}
-	return expr;
-}
-
 void Parser::parseTo(Sheet* shp, ExprPointer& ep){
 	Expression* expr = parse(shp);
 	if (expr) {

@@ -37,7 +37,6 @@ public:
 	void addTokenFromStr(std::string& str_buffer);
 
 	Expression* parse(Sheet* shp = NULL);
-	Expression* parseNoThrow(Sheet* shp = NULL);
 	void parseTo(Sheet* shp, ExprPointer& ep);
 
 	std::string show();
