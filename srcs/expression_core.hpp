@@ -14,6 +14,7 @@ public:
 	virtual std::string show() const = 0;
 	virtual Expression* copy() const = 0;
 	virtual void shift(int dx, int dy) = 0;
+	virtual void relocate(const void*) = 0;
 	virtual ~Expression() {};
 };
 
@@ -46,6 +47,7 @@ public:
 	Expression* copy() const {return new NumberExpr(value);}
 	std::string show() const {std::ostringstream ss; ss << value; return ss.str();}
 	void shift(int dx, int dy) {dx=dy; dy=dx;}
+	void relocate(const void*) {}
 };
 
 #endif

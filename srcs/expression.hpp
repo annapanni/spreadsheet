@@ -38,6 +38,7 @@ public:
 	std::string show() const {return (absCol?"$":"") + cell.colLetter() + (absRow?"$":"") + std::to_string(cell.row);}
 	CellRefExpr* copy() const {return new CellRefExpr(*this);}
 	void shift(int dx, int dy);
+	void relocate(const void* shp) {sh = (Sheet*)shp;}
 };
 
 class Range {
@@ -68,6 +69,7 @@ public:
 	iterator end() const;
 	std::string show() const {return topCell->show() + ":" + bottomCell->show();}
 	void shift(int dx, int dy) {topCell->shift(dx, dy); bottomCell->shift(dx, dy);}
+	void relocate(const void* shp) {topCell->relocate(shp); bottomCell->relocate(shp);}
 	~Range(){
 		delete topCell;
 		delete bottomCell;
@@ -86,6 +88,7 @@ public:
 	FunctionExpr(CellRefExpr* topCell, CellRefExpr* bottomCell) : range(topCell, bottomCell) {}
 	void checkCyclic(std::vector<Expression*>) const;
 	void shift(int dx, int dy) {range.shift(dx, dy);}
+	void relocate(const void* shp) {range.relocate(shp);}
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
@@ -124,6 +127,7 @@ public:
 	Operator& operator=(const Operator& op);
 	void checkCyclic(std::vector<Expression*> ps) const {lhs->checkCyclic(ps); rhs->checkCyclic(ps);}
 	void shift(int dx, int dy) {lhs->shift(dx, dy); rhs->shift(dx, dy);}
+	void relocate(const void* shp) {lhs->relocate(shp); rhs->relocate(shp);}
 	virtual ~Operator(){
 		delete lhs;
 		delete rhs;

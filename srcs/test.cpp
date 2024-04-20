@@ -195,10 +195,15 @@ TEST (Sheet, constrAndGetters){
 		sh[0][0] = new NumberExpr(7);
 		EXPECT_EQ(sh[0][0]->eval(), 7);
 		EXPECT_THROW(sh[6][0]->show(), const char*);
+		sh[1][0] = new CellRefExpr("a1", &sh);
 		sh2 = sh;
+		Sheet sh3(sh);
+		sh[0][0] = new NumberExpr(5);
+		EXPECT_EQ(sh3[1][0]->eval(), 7);
 	}
 	EXPECT_EQ(sh2[0][1]->eval(), 3);
 	EXPECT_EQ(sh2[0][0]->eval(), 7);
+	EXPECT_EQ(sh2[1][0]->eval(), 7);
 
 	EXPECT_EQ(sh2.getXCoord(&sh2[0][0]), 0);
 	EXPECT_EQ(sh2.getYCoord(&sh2[0][0]), 0);
@@ -221,9 +226,12 @@ TEST (Sheet, functions){
 	EXPECT_EQ(sh.checkCol(0), false);
 
 	sh[0][0] = new NumberExpr(7);
+	sh[1][0] = new CellRefExpr("a1", &sh);
 	Sheet sh2(2,2);
 	sh.copyTo(sh2);
+	sh[0][0] = new NumberExpr(5);
 	EXPECT_EQ(sh2[0][0]->eval(), 7);
+	EXPECT_EQ(sh2[1][0]->eval(), 7);
 	sh2.resize(4, 3, 1.2);
 	EXPECT_EQ(sh2.getWidth(), 4);
 	EXPECT_EQ(sh2.getHeight(), 3);

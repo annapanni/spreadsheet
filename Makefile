@@ -10,14 +10,12 @@ OBJS1 = $(OBJS) $(SRCS1:.cpp=.o)
 
 SRCS2 = srcs/main.cpp
 OBJS2 = $(OBJS) $(SRCS2:.cpp=.o)
-PROG2 = console
 
-TARGETS = $(PROG1) $(PROG2)
 
 test: $(OBJS1)
 	$(CXX) $^ $(CXXFLAGS) $(GTTESTFLAGS) -o $@
 
-$(PROG2): $(OBJS2)
+console: $(OBJS2)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
 #$(TARGET) : $(OBJS)
