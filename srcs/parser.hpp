@@ -8,6 +8,7 @@
 #include "token.hpp"
 #include "expression.hpp"
 #include "sheet.hpp"
+#include "exceptions.hpp"
 
 
 class Parser {

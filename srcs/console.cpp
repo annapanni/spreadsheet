@@ -76,7 +76,8 @@ void Console::load() {
 		std::stringstream linestream(line);
 		while (getline(linestream, word, ',') && col < w) {
 			try {Parser(word).parseTo(&newsh, newsh[row][col]);}
-			catch (const char*) {}
+			catch (const syntax_error& err) {}
+			catch (const eval_error& err) {}
 			col++;
 		}
 		row++;
@@ -97,7 +98,8 @@ void Console::set() {
 		} else {
 			os << "index out of range\n";
 		}
-	} catch (const char* msg){os << msg;}
+	} catch (const syntax_error& err) {os << "syntax error: " << err.what() << std::endl;
+	} catch (const eval_error& err) {os << "evaluation error: " << err.what() << std::endl;}
 }
 
 void Console::pull() {
@@ -112,7 +114,8 @@ void Console::pull() {
 			*cell = (*start.getPtr())->copy();
 			(*cell)->shift(sh.getXCoord(&*cell)-sx, sh.getYCoord(&*cell)-sy);
 		}
-	} catch (const char* msg) {os << msg;}
+	} catch (const syntax_error& err) {os << "syntax error: " << err.what() << std::endl;
+	} catch (const eval_error& err) {os << "evaluation error: " << err.what() << std::endl;}
 }
 
 void Console::show() {
@@ -126,7 +129,8 @@ void Console::show() {
 		} else {
 			os << "index out of range\n";
 		}
-	} catch (const char* msg) {os << msg;}
+	} catch (const syntax_error& err) {os << "syntax error: " << err.what() << std::endl;
+	} catch (const eval_error& err) {os << "evaluation error: " << err.what() << std::endl;}
 }
 
 void Console::readCommand(){
@@ -155,6 +159,6 @@ void Console::readCommand(){
 	} else if (command == "exit") {
 		exit();
 	} else {
-		os << "\ninvalid command\n";
+		os << "invalid command\n";
 	}
 }

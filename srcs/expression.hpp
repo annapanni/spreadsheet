@@ -7,6 +7,7 @@
 
 #include "expression_core.hpp"
 #include "sheet.hpp"
+#include "exceptions.hpp"
 
 class CellId {
 public:
@@ -30,7 +31,8 @@ public:
 	std::string getCol() const {return cell.colLetter();}
 	int getRow() const {return cell.row;}
 	Sheet* getSheet() const {return sh;}
-	ExprPointer* getPtr() const {if (sh == NULL) throw "uninitialized cell\n"; return sh->parseCell(cell.colNum, cell.row);}
+	ExprPointer* getPtr() const {if (sh == NULL) throw eval_error("uninitialized cell");
+		return sh->parseCell(cell.colNum, cell.row);}
 	bool getAbsCol() const {return absCol;}
 	bool getAbsRow() const {return absRow;}
 	double eval() const;
@@ -57,7 +59,7 @@ public:
 		iterator() : rangeWidth(0), tableWidth(0), actRow(NULL), actCell(NULL) {}
 		iterator(size_t rw, size_t tw, ExprPointer* bp)
 			: rangeWidth(rw), tableWidth(tw), actRow(bp), actCell(bp) {}
-		ExprPointer& operator*() const {if (actCell==NULL) throw "empty iterator"; return *actCell;}
+		ExprPointer& operator*() const {if (actCell==NULL) throw std::runtime_error("empty iterator"); return *actCell;}
 		ExprPointer* operator->() const {return actCell;}
 		bool operator==(const ExprPointer* ep) const {return actCell == ep;}
 		bool operator==(const iterator& it) const {return actCell == it.actCell;}

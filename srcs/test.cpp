@@ -2,6 +2,7 @@
 #include <string>
 #include <sstream>
 
+#include "exceptions.hpp"
 #include "expression.hpp"
 #include "sheet.hpp"
 #include "parser.hpp"
@@ -19,7 +20,7 @@ TEST(Expression, Number){
 TEST(Expression, CellRef){
 	CellRefExpr empty("sdf645");
 	EXPECT_EQ(empty.show(), "sdf645");
-	EXPECT_THROW(empty.eval(), const char*);
+	EXPECT_THROW(empty.eval(), eval_error);
 	Sheet sh(3, 3, 5);
 	CellRefExpr c (std::string("b3"), &sh);
 	EXPECT_EQ(c.eval(), 5);
@@ -30,8 +31,8 @@ TEST(Expression, CellRef){
 	Expression* cc = c.copy();
 	EXPECT_EQ(cc->show(), "b3");
 	EXPECT_NO_THROW(c.checkCyclic({cc}));
-	EXPECT_THROW(c.checkCyclic({(Expression*)sh[2][1]}), const char*);
-	EXPECT_THROW(cc->checkCyclic({(Expression*)sh[2][1]}), const char*);
+	EXPECT_THROW(c.checkCyclic({(Expression*)sh[2][1]}), eval_error);
+	EXPECT_THROW(cc->checkCyclic({(Expression*)sh[2][1]}), eval_error);
 	delete cc;
 
 	CellRefExpr cell (std::string("b2"), &sh);
@@ -42,7 +43,7 @@ TEST(Expression, CellRef){
 	cell.shift(0, -1);
 	EXPECT_EQ(cell.getPtr(), &(sh[1][1]));
 	cell.shift(2, 0);
-	EXPECT_THROW(cell.getPtr(), const char*);
+	EXPECT_THROW(cell.getPtr(), eval_error);
 }
 
 Sheet sh(3,3, 5);
@@ -96,7 +97,7 @@ TEST (Expression, Range2){
 
 TEST (Expression, Function){
 	SumFunc sum = SumFunc(a1->copy(), b3->copy());
-	EXPECT_THROW(sum.checkCyclic({(Expression*)*(a1->getPtr()+1)}), const char*);
+	EXPECT_THROW(sum.checkCyclic({(Expression*)*(a1->getPtr()+1)}), eval_error);
 	EXPECT_EQ(sum.eval(), 30);
 	FunctionExpr* avg = newFunctionExpr(AVG, c2->copy(), a1->copy());
 	EXPECT_NO_THROW(avg->checkCyclic({(Expression*)*(b3->getPtr())}));
@@ -120,7 +121,7 @@ TEST (Expression, Mult){
 	}
 	EXPECT_EQ(opcpy->eval(), 25);
 	EXPECT_EQ(opcpy->show(), "(a1*b3)");
-	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), eval_error);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1*c3)");
 	delete opcpy;
@@ -136,7 +137,7 @@ TEST (Expression, Div){
 	}
 	EXPECT_EQ(opcpy->eval(), 1);
 	EXPECT_EQ(opcpy->show(), "(a1/b3)");
-	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), eval_error);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1/c3)");
 	delete opcpy;
@@ -152,7 +153,7 @@ TEST (Expression, Add){
 	}
 	EXPECT_EQ(opcpy->eval(), 10);
 	EXPECT_EQ(opcpy->show(), "(a1+b3)");
-	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), eval_error);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1+c3)");
 	delete opcpy;
@@ -168,7 +169,7 @@ TEST (Expression, Sub){
 	}
 	EXPECT_EQ(opcpy->eval(), 0);
 	EXPECT_EQ(opcpy->show(), "(a1-b3)");
-	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), const char*);
+	EXPECT_THROW(opcpy->checkCyclic({(Expression*)*(b3->getPtr())}), eval_error);
 	opcpy->shift(1, 0);
 	EXPECT_EQ(opcpy->show(), "(b1-c3)");
 	delete opcpy;
@@ -181,7 +182,7 @@ TEST (Sheet, statics){
 	EXPECT_EQ(Sheet::colNumber("ab"), 28);
 	EXPECT_EQ(Sheet::colLetter(Sheet::colNumber("abcdf")), "abcdf");
 	EXPECT_EQ(Sheet::colNumber(Sheet::colLetter(4268)), 4268);
-	EXPECT_THROW(Sheet::colNumber("*"), const char*);
+	EXPECT_THROW(Sheet::colNumber("*"), syntax_error);
 	Sheet sh2;
 }
 
@@ -194,7 +195,7 @@ TEST (Sheet, constrAndGetters){
 		EXPECT_EQ(sh[0][0]->eval(), 3);
 		sh[0][0] = new NumberExpr(7);
 		EXPECT_EQ(sh[0][0]->eval(), 7);
-		EXPECT_THROW(sh[6][0]->show(), const char*);
+		EXPECT_THROW(sh[6][0]->show(), std::out_of_range);
 		sh[1][0] = new CellRefExpr("a1", &sh);
 		sh2 = sh;
 		Sheet sh3(sh);
@@ -219,7 +220,7 @@ TEST (Sheet, functions){
 	EXPECT_EQ(sh[0][0], *(sh.parseCell("a", 1)));
 	EXPECT_EQ(sh[0][2], *(sh.parseCell(3, 1)));
 	EXPECT_EQ(sh[1][2], *(sh.parseCell("c", 2)));
-	EXPECT_THROW(sh.parseCell("f", 2), const char*);
+	EXPECT_THROW(sh.parseCell("f", 2), eval_error);
 	EXPECT_EQ(sh.checkRow(6), true);
 	EXPECT_EQ(sh.checkRow(0), false);
 	EXPECT_EQ(sh.checkCol(5), true);
@@ -280,37 +281,37 @@ TEST (Parser, parsing){
 }
 
 TEST (Parser, parsingErrors){
-	EXPECT_THROW(Parser("").parse(), const char*);
-	EXPECT_THROW(Parser("a").parse(), const char*);
-	EXPECT_THROW(Parser("a1s").parse(), const char*);
-	EXPECT_THROW(Parser("$a").parse(), const char*);
-	EXPECT_THROW(Parser("a$").parse(), const char*);
-	EXPECT_THROW(Parser("$a$").parse(), const char*);
-	EXPECT_THROW(Parser("$1").parse(), const char*);
-	EXPECT_THROW(Parser("$1$").parse(), const char*);
-	EXPECT_THROW(Parser("34+").parse(), const char*);
-	EXPECT_THROW(Parser("/234").parse(), const char*);
-	EXPECT_THROW(Parser("32+34*").parse(), const char*);
-	EXPECT_THROW(Parser("hah(a1:b2)").parse(), const char*);
-	EXPECT_THROW(Parser("sum($a1:b$)").parse(), const char*);
-	EXPECT_THROW(Parser("sum(a1)").parse(), const char*);
-	EXPECT_THROW(Parser("sum(a1:)").parse(), const char*);
-	EXPECT_THROW(Parser("sum(a1:b2").parse(), const char*);
-	EXPECT_THROW(Parser("12* 34 + ((12 +1)").parse(), const char*);
+	EXPECT_THROW(Parser("").parse(), syntax_error);
+	EXPECT_THROW(Parser("a").parse(), syntax_error);
+	EXPECT_THROW(Parser("a1s").parse(), syntax_error);
+	EXPECT_THROW(Parser("$a").parse(), syntax_error);
+	EXPECT_THROW(Parser("a$").parse(), syntax_error);
+	EXPECT_THROW(Parser("$a$").parse(), syntax_error);
+	EXPECT_THROW(Parser("$1").parse(), syntax_error);
+	EXPECT_THROW(Parser("$1$").parse(), syntax_error);
+	EXPECT_THROW(Parser("34+").parse(), syntax_error);
+	EXPECT_THROW(Parser("/234").parse(), syntax_error);
+	EXPECT_THROW(Parser("32+34*").parse(), syntax_error);
+	EXPECT_THROW(Parser("hah(a1:b2)").parse(), syntax_error);
+	EXPECT_THROW(Parser("sum($a1:b$)").parse(), syntax_error);
+	EXPECT_THROW(Parser("sum(a1)").parse(), syntax_error);
+	EXPECT_THROW(Parser("sum(a1:)").parse(), syntax_error);
+	EXPECT_THROW(Parser("sum(a1:b2").parse(), syntax_error);
+	EXPECT_THROW(Parser("12* 34 + ((12 +1)").parse(), syntax_error);
 }
 
 TEST (Parser, evalErrors){
 	Expression* expr = Parser("a4").parse();
-	EXPECT_THROW(expr->eval(), const char*);
+	EXPECT_THROW(expr->eval(), eval_error);
 	delete expr;
 
 	Sheet(1, 1);
 	Parser("a1").parseTo(&sh, sh[0][0]);
-	EXPECT_THROW(sh[0][0].evalMe(), const char*);
+	EXPECT_THROW(sh[0][0].evalMe(), eval_error);
 	Parser("asd1").parseTo(&sh, sh[0][0]);
-	EXPECT_THROW(sh[0][0].evalMe(), const char*);
+	EXPECT_THROW(sh[0][0].evalMe(), eval_error);
 	Parser("a10").parseTo(&sh, sh[0][0]);
-	EXPECT_THROW(sh[0][0].evalMe(), const char*);
+	EXPECT_THROW(sh[0][0].evalMe(), std::runtime_error);
 }
 
 TEST (Console, functions){
@@ -334,7 +335,7 @@ TEST (Console, functions){
 	iss << "e9 "; con.show();
 	iss << "e10 "; con.show();
 	EXPECT_EQ(oss.str(),
-		"sum($a$1:a2) = 10\nsum($a$1:b10) = 240\nsum($a$1:b11) = index out of range\n");
+		"sum($a$1:a2) = 10\nsum($a$1:b10) = 240\nsum($a$1:b11) = evaluation error: index out of range\n");
 	oss.str("");
 	con.exit();
 	EXPECT_EQ(con.isClosed(), true);
@@ -350,7 +351,7 @@ TEST (Console, readCommand){
 
 	iss  << "set a2 sum(a1:b2) show a2 ";
 	for (int i = 0; i < 2; i++) {con.readCommand();}
-	EXPECT_EQ(oss.str(), "sum(a1:b2) = cyclic reference\n");
+	EXPECT_EQ(oss.str(), "sum(a1:b2) = evaluation error: cyclic reference\n");
 	oss.str("");
 
 	iss  << "pull a1 b1 show b1 ";

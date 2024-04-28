@@ -6,6 +6,7 @@
 #include <math.h>
 
 #include "expression_core.hpp"
+#include "exceptions.hpp"
 
 class Sheet {
 	ExprPointer* table;
@@ -21,7 +22,7 @@ public:
 	ExprPointer* operator[](size_t i) {
 		if (i < height)
 			return table + i*width;
-		throw "index out of range\n";
+		throw std::out_of_range("");
 	}
 	static int colNumber(std::string);
 	static std::string colLetter (int);

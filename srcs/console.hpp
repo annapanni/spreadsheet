@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
 #include "parser.hpp"
 #include "sheet.hpp"
-#include <string>
+#include "exceptions.hpp"
 
 class Console {
 	Sheet sh;

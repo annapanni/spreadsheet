@@ -36,7 +36,7 @@ int Sheet::colNumber(std::string str) {
 	int col = 0;
 	for (char c : str) {
 		if (!std::isalpha(c))
-			throw "invalid column\n";
+			throw syntax_error("invalid column name");
 		col = col*26 + std::tolower(c) - 'a' + 1;
 	}
 	return col;
@@ -55,7 +55,7 @@ ExprPointer* Sheet::parseCell(int col, int row) const {
 	if (checkRow(row) && checkCol(col)) {
 		return &(table[(row-1)*width + col -1]); //indexing from 0
 	}
-	throw "index out of range\n";
+	throw eval_error("index out of range");
 }
 ExprPointer* Sheet::parseCell(std::string col, int row) const {
 	int cn = colNumber(col);
@@ -101,7 +101,7 @@ void Sheet::formattedPrint(std::ostream& os) const {
 		for (int col = 0; col < (int)width; col++) {
 			try {
 				os << table[row*width + col].evalMe() << "\t";
-			} catch (const char* msg){
+			} catch (const eval_error&){
 				os << "#ERR" << "\t";
 			}
 		}

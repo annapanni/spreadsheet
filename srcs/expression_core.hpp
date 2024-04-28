@@ -6,6 +6,8 @@
 #include <iostream>
 #include <vector>
 
+class Sheet;
+
 class Expression {
 public:
 	virtual double eval() const = 0;

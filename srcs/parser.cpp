@@ -70,25 +70,25 @@ bool Parser::match(Token_type tt){
 Token* Parser::consume(Token_type tt, const char* msg){
 	if (match(tt))
 		return prev();
-	throw msg;
+	throw syntax_error(msg);
 }
 
 Expression* Parser::expression(Sheet* shp){
 	Expression* expr = factor(shp);
 	if (expr == NULL)
-		throw "not enough arguments\n";
+		throw syntax_error("not enough arguments");
 	while (match(MINUS) || match(PLUS)){
 		Token_type operand = prev()->getType();
 		Expression* rhs;
 		try {
 			rhs = factor(shp);
-		} catch (const char* msg){
+		} catch (const std::runtime_error&){
 			delete expr;
-			throw msg;
+			throw;
 		}
 		if (rhs == NULL){
 			delete expr;
-			throw "not enough arguments\n";
+			throw syntax_error("not enough arguments");
 		}
 		expr = operandFromToken(operand, expr, rhs);
 	}
@@ -97,15 +97,15 @@ Expression* Parser::expression(Sheet* shp){
 Expression* Parser::factor(Sheet* shp){
 	Expression* expr = unary(shp);
 	if (expr == NULL)
-		throw "not enough arguments\n";
+		throw syntax_error("not enough arguments");
 	while (match(SLASH) || match(STAR)){
 		Token_type operand = prev()->getType();
 		Expression* rhs;
 		try {
 			rhs = unary(shp);
-		} catch (const char* msg) {
+		} catch (const std::runtime_error&) {
 			delete expr;
-			throw msg;
+			throw;
 		}
 		if (rhs == NULL){
 			delete expr;
@@ -133,18 +133,18 @@ Expression* Parser::function(Sheet* shp){
 		FunctionName fname = FunctionExpr::parseFname(fstr);
 		if (match(LEFT_BR)) {
 			if (fname == INVALID)
-				throw "invalid function name\n";
+				throw syntax_error("invalid function name");
 			CellRefExpr* c1 = NULL;
 			CellRefExpr* c2 = NULL;
 			try {
 				c1 = cell(shp);
-				consume(COLON, "invalid range in function\n");
+				consume(COLON, "invalid range in function");
 				c2 = cell(shp);
-				consume(RIGHT_BR, "mismatched brackets\n");
-			} catch (const char* msg){
+				consume(RIGHT_BR, "mismatched brackets");
+			} catch (const std::runtime_error&){
 				delete c1;
 				delete c2;
-				throw msg;
+				throw;
 			}
 			if (c1!=NULL && c2!=NULL) {
 				return newFunctionExpr(fname, c1, c2);
@@ -164,15 +164,15 @@ Expression* Parser::primary(Sheet* shp){
 			DataToken<double>* nt = dynamic_cast<DataToken<double>*>(prev());
 			return new NumberExpr(nt->getContent());
 		} catch (const std::bad_cast& bc){
-			throw "tokenization error\n";
+			throw std::runtime_error("tokenization error");
 		}
 	} else if (match(LEFT_BR)){
 		expr = expression(shp);
 		try {
-			consume(RIGHT_BR, "mismatched brackets\n");
-		} catch (const char* msg){
+			consume(RIGHT_BR, "mismatched brackets");
+		} catch (const std::runtime_error&){
 			delete expr;
-			throw msg;
+			throw;
 		}
 		return expr;
 	} else if ((expr = cell(shp))){
@@ -190,19 +190,19 @@ CellRefExpr* Parser::cell(Sheet* shp){
 	if (match(STRING)) {
 		try	{
 			colstr = dynamic_cast<DataToken<std::string>*>(prev())->getContent();
-		} catch (const std::bad_cast& bc) {throw "tokenization error\n";}
-	}
-	if (match(DOLLAR)) {//col and row are separated, row is absolute
-		if (match(NUMBER)) {
-			try	{
-				int n = (int)dynamic_cast<DataToken<double>*>(prev())->getContent();
-				return new CellRefExpr(colstr, n, shp, absCol, true);
-			} catch (const std::bad_cast& bc) {throw "tokenization error\n";}
-		} else {
-			throw "invalid syntax\n";
+		} catch (const std::bad_cast& bc) {throw std::runtime_error("tokenization error");}
+		if (match(DOLLAR)) {//col and row are separated, row is absolute
+			if (match(NUMBER)) {
+				try	{
+					int n = (int)dynamic_cast<DataToken<double>*>(prev())->getContent();
+					return new CellRefExpr(colstr, n, shp, absCol, true);
+				} catch (const std::bad_cast& bc) {throw std::runtime_error("tokenization error");}
+			} else {
+				throw syntax_error("invalid cell syntax");
+			}
+		} else {//row isn't absolute
+			return new CellRefExpr(colstr, shp, absCol, false);
 		}
-	} else {//row isn't absolute
-		return new CellRefExpr(colstr, shp, absCol, false);
 	}
 	return expr;
 }

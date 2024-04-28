@@ -9,8 +9,8 @@ CellId::CellId(std::string cellstr){
 		std::string numstr = cellstr.substr(i, cellstr.size()-i);
 		row = stoi(numstr, &pos);
 		if (pos < numstr.size())
-			throw "invalid cell\n";
-	} catch (const std::invalid_argument& ia) {throw "invalid cell\n";}
+			throw syntax_error("invalid cell");
+	} catch (const std::invalid_argument& ia) {throw syntax_error("invalid cell");}
 }
 
 double CellRefExpr::eval() const {
@@ -20,7 +20,7 @@ double CellRefExpr::eval() const {
 void CellRefExpr::checkCyclic(std::vector<Expression*> ps) const {
 	for (Expression* expP : ps) {
 		if (*getPtr() == expP) {
-			throw "cyclic reference\n";
+			throw eval_error("cyclic reference");
 		}
 	}
 	ps.push_back((Expression*)*getPtr());
@@ -65,7 +65,7 @@ Range& Range::operator=(const Range& r){
 
 Range::iterator& Range::iterator::operator++() {//preinkremens
 	if (actCell == NULL)
-		throw "empty iterator";
+		throw std::runtime_error("empty iterator");
 	if (actCell + 1 <= actRow+rangeWidth) {
 		++actCell;
 	} else {
@@ -99,7 +99,7 @@ void FunctionExpr::checkCyclic(std::vector<Expression*> ps) const {
 	for (cell = range.begin(); cell != range.end(); cell++) {
 		for (Expression* exprP : ps) {
 			if (*cell ==  exprP) {
-				throw "cyclic reference\n";
+				throw eval_error("cyclic reference");
 			}
 		}
 		ps.push_back((Expression*)*cell);
