@@ -10,9 +10,13 @@
 #include "exceptions.hpp"
 
 class CellId {
-public:
 	int colNum;
 	int row;
+public:
+	int getColNum() const {return colNum;}
+	int getRow() const {return row;}
+	void setColNum(int c) {colNum = c;}
+	void setRow(int r) {row = r;}
 	CellId(std::string col, int row) : colNum(Sheet::colNumber(col)), row(row) {}
 	CellId(std::string);
 	std::string colLetter() const {return Sheet::colLetter(colNum);}
@@ -29,15 +33,15 @@ public:
 	CellRefExpr(std::string str, Sheet* sh = NULL, bool absCol=false, bool absRow=false)
 		: cell(CellId(str)), sh(sh), absCol(absCol), absRow(absRow) {}
 	std::string getCol() const {return cell.colLetter();}
-	int getRow() const {return cell.row;}
+	int getRow() const {return cell.getRow();}
 	Sheet* getSheet() const {return sh;}
 	ExprPointer* getPtr() const {if (sh == NULL) throw eval_error("uninitialized cell");
-		return sh->parseCell(cell.colNum, cell.row);}
+		return sh->parseCell(cell.getColNum(), cell.getRow());}
 	bool getAbsCol() const {return absCol;}
 	bool getAbsRow() const {return absRow;}
 	double eval() const;
 	void checkCyclic(std::vector<Expression*>) const;
-	std::string show() const {return (absCol?"$":"") + cell.colLetter() + (absRow?"$":"") + std::to_string(cell.row);}
+	std::string show() const {return (absCol?"$":"") + cell.colLetter() + (absRow?"$":"") + std::to_string(cell.getRow());}
 	CellRefExpr* copy() const {return new CellRefExpr(*this);}
 	void shift(int dx, int dy);
 	void relocate(const void* shp) {sh = (Sheet*)shp;}
@@ -96,6 +100,7 @@ public:
 		if (name == "sum") return SUM;
 		return INVALID;
 	}
+	static FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell);
 	virtual ~FunctionExpr(){}
 };
 
@@ -116,8 +121,6 @@ public:
 	std::string show() const {return "sum(" + range.show() + ")";}
 	Expression* copy() const {return new SumFunc(range);}
 };
-
-FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell);
 
 class Operator : public Expression {
 protected:

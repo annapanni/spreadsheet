@@ -99,7 +99,7 @@ TEST (Expression, Function){
 	SumFunc sum = SumFunc(a1->copy(), b3->copy());
 	EXPECT_THROW(sum.checkCyclic({(Expression*)*(a1->getPtr()+1)}), eval_error);
 	EXPECT_EQ(sum.eval(), 30);
-	FunctionExpr* avg = newFunctionExpr(AVG, c2->copy(), a1->copy());
+	FunctionExpr* avg = FunctionExpr::newFunctionExpr(AVG, c2->copy(), a1->copy());
 	EXPECT_NO_THROW(avg->checkCyclic({(Expression*)*(b3->getPtr())}));
 	EXPECT_EQ(avg->eval(), 5);
 	EXPECT_EQ(avg->show(), "avg(a1:c2)");

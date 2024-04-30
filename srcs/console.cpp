@@ -91,10 +91,10 @@ void Console::set() {
 	is >> cellstr;
 	try	{
 		CellId cid(cellstr);
-		if (sh.checkRow(cid.row) && sh.checkCol(cid.colNum)){
+		if (sh.checkRow(cid.getRow()) && sh.checkCol(cid.getColNum())){
 			std::string inp;
 			is >> inp;
-			Parser(inp).parseTo(&sh, sh[cid.row-1][cid.colNum-1]);
+			Parser(inp).parseTo(&sh, sh[cid.getRow()-1][cid.getColNum()-1]);
 		} else {
 			os << "index out of range\n";
 		}
@@ -123,9 +123,9 @@ void Console::show() {
 	is >> cellstr;
 	try	{
 		CellId cid(cellstr);
-		if (sh.checkRow(cid.row) && sh.checkCol(cid.colNum)){
-			os << sh[cid.row-1][cid.colNum-1]->show() << " = ";
-			os << sh[cid.row-1][cid.colNum-1].evalMe() << '\n';
+		if (sh.checkRow(cid.getRow()) && sh.checkCol(cid.getColNum())){
+			os << sh[cid.getRow()-1][cid.getColNum()-1]->show() << " = ";
+			os << sh[cid.getRow()-1][cid.getColNum()-1].evalMe() << '\n';
 		} else {
 			os << "index out of range\n";
 		}

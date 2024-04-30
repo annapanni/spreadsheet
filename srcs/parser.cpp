@@ -147,7 +147,7 @@ Expression* Parser::function(Sheet* shp){
 				throw;
 			}
 			if (c1!=NULL && c2!=NULL) {
-				return newFunctionExpr(fname, c1, c2);
+				return FunctionExpr::newFunctionExpr(fname, c1, c2);
 			} else {
 				delete c1;
 				delete c2;

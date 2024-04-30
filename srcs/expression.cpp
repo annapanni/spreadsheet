@@ -29,9 +29,9 @@ void CellRefExpr::checkCyclic(std::vector<Expression*> ps) const {
 
 void CellRefExpr::shift(int dx, int dy) {
 	if (!absRow)
-		cell.row += dy;
+		cell.setRow(cell.getRow() + dy);
 	if (!absCol)
-	  cell.colNum += dx;
+		cell.setColNum(cell.getColNum() + dx);
 }
 
 Range::Range(CellRefExpr* bg, CellRefExpr* ed) {
@@ -108,7 +108,7 @@ void FunctionExpr::checkCyclic(std::vector<Expression*> ps) const {
 	}
 }
 
-FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell){
+FunctionExpr* FunctionExpr::newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell){
 	switch (fn) {
 		case AVG:
 			return new AvgFunc(topCell, bottomCell);
