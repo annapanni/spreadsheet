@@ -14,9 +14,9 @@ class Console {
 	std::istream& is;
 	bool closed = false;
 public:
-	Console() : sh(Sheet()), os(std::cout), is(std::cin) {}
+	Console() : os(std::cout), is(std::cin) {}
 	Console(Sheet sh, std::ostream& os, std::istream& is) : sh(sh), os(os), is(is) {}
-	Console(std::ostream& os, std::istream& is) : sh(Sheet()), os(os), is(is) {}
+	Console(std::ostream& os, std::istream& is) : os(os), is(is) {}
 
 	bool isClosed() const {return closed;}
 

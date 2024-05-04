@@ -1,5 +1,6 @@
 #include "expression.hpp"
 
+//CellId fuctions --------------------------------------------------------------
 CellId::CellId(std::string cellstr){
 	try	{
 		size_t i;
@@ -13,6 +14,7 @@ CellId::CellId(std::string cellstr){
 	} catch (const std::invalid_argument& ia) {throw syntax_error("invalid cell");}
 }
 
+//CellRefExpr fuctions ---------------------------------------------------------
 double CellRefExpr::eval() const {
 	return (*getPtr())->eval();
 }
@@ -34,6 +36,7 @@ void CellRefExpr::shift(int dx, int dy) {
 		cell.setColNum(cell.getColNum() + dx);
 }
 
+//Range fuctions ---------------------------------------------------------------
 Range::Range(CellRefExpr* bg, CellRefExpr* ed) {
 	std::string bgCol = bg->getCol();
 	std::string edCol = ed->getCol();
@@ -63,6 +66,7 @@ Range& Range::operator=(const Range& r){
 	return *this;
 }
 
+//Range iterator fuctions ------------------------------------------------------
 Range::iterator& Range::iterator::operator++() {//preinkremens
 	if (actCell == NULL)
 		throw std::runtime_error("empty iterator");
@@ -74,26 +78,30 @@ Range::iterator& Range::iterator::operator++() {//preinkremens
 	}
 	return *this;
 }
+
 Range::iterator Range::iterator::operator++(int) {//posztinkremens
 	iterator tmp = *this;
 	operator++();
 	return tmp;
 }
+
 Range::iterator Range::begin() const{
 	Sheet* sh = topCell->getSheet();
 	ExprPointer* bp = topCell->getPtr();
 	ExprPointer* ep = bottomCell->getPtr();
-	size_t rangeWidth = (ep - bp) % (int)(sh->getWidth()); // used to be -1 +1
+	size_t rangeWidth = (ep - bp) % (int)(sh->getWidth());
 	return iterator(rangeWidth, sh->getWidth(), bp);
 }
+
 Range::iterator Range::end() const{
 	Sheet* sh = topCell->getSheet();
 	ExprPointer* bp = topCell->getPtr();
 	ExprPointer* ep = bottomCell->getPtr();
-	size_t rangeWidth = (ep - bp) % (int)sh->getWidth();  // used to be -1 +1
+	size_t rangeWidth = (ep - bp) % (int)sh->getWidth();
 	return iterator(rangeWidth, sh->getWidth(), ep-rangeWidth+sh->getWidth());
 }
 
+//FunctionExpr fuctions ------------------------------------------------------
 void FunctionExpr::checkCyclic(std::vector<Expression*> ps) const {
 	Range::iterator cell;
 	for (cell = range.begin(); cell != range.end(); cell++) {
@@ -139,6 +147,7 @@ double SumFunc::eval() const {
 	return sum;
 }
 
+//Operator fuctions ------------------------------------------------------
 Operator& Operator::operator=(const Operator& op){
 	if (&op != this) {
 		delete lhs;

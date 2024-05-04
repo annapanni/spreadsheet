@@ -6,7 +6,7 @@
 Sheet::Sheet(const Sheet& sh): width(sh.width), height(sh.height){
 	table = new ExprPointer[sh.width * sh.height];
 	for (size_t i = 0; i < width*height; i++) {
-		table[i] = sh.table[i]->copy();
+		table[i] = sh.table[i];
 		table[i]->relocate(this);
 	}
 }
@@ -25,7 +25,7 @@ Sheet& Sheet::operator=(const Sheet& sh){
 		delete[] table;
 		table = new ExprPointer[sh.width * sh.height];
 		for (size_t i = 0; i < width*height; i++) {
-			table[i] = sh.table[i]->copy();
+			table[i] = sh.table[i];
 			table[i]->relocate(this);
 		}
 	}
@@ -74,7 +74,7 @@ void Sheet::copyTo(Sheet& sh) const {
 	size_t minh = sh.height < height ? sh.height : height;
 	for (size_t row = 0; row < minh; row++){
 		for (size_t col = 0; col < minw; col++){
-			sh[row][col] = table[row*width + col]->copy();
+			sh[row][col] = table[row*width + col];
 			sh[row][col]->relocate(&sh);
 		}
 	}

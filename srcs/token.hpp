@@ -13,9 +13,8 @@ enum Token_type {
 	DOLLAR, NUMBER, STRING
 };
 
-/**
-*Tokenek osztálya.
-*Az kifejezés értelmező ezen osztály példányaival tárolja el a kifejezéseket
+///Tokenek osztálya.
+/**Az kifejezés értelmező ezen osztály példányaival tárolja el a kifejezéseket
 */
 class Token {
 protected:
@@ -31,9 +30,8 @@ public:
 	virtual ~Token(){} ///<destruktor
 };
 
-/**
-*Adattartalommal rendelkezó tokenek osztálya.
-*A token osztály leszármazottja az olyan tokeneknek, amelyek a típusokon felül más adattartalommal is rendelkeznek.
+///Adattartalommal rendelkezó tokenek osztálya.
+/**A token osztály leszármazottja az olyan tokeneknek, amelyek a típusokon felül más adattartalommal is rendelkeznek.
 */
 template <typename T>
 class DataToken : public Token {
