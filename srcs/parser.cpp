@@ -90,7 +90,7 @@ Expression* Parser::expression(Sheet* shp){
 			delete expr;
 			throw syntax_error("not enough arguments");
 		}
-		expr = operandFromToken(operand, expr, rhs);
+		expr = Operator::operandFromToken(operand, expr, rhs);
 	}
 	return expr;
 }
@@ -111,7 +111,7 @@ Expression* Parser::factor(Sheet* shp){
 			delete expr;
 			return NULL;
 		}
-		expr = operandFromToken(operand, expr, rhs);
+		expr = Operator::operandFromToken(operand, expr, rhs);
 	}
 	return expr;
 }
@@ -225,19 +225,4 @@ std::string Parser::show(){
 		outp += t->show() + ", ";
 	}
 	return outp;
-}
-
-Operator* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs){
-	switch (tt) {
-		case PLUS:
-			return new Add(lhs, rhs);
-		case MINUS:
-			return new Sub(lhs, rhs);
-		case STAR:
-			return new Mult(lhs, rhs);
-		case SLASH:
-			return new Div(lhs, rhs);
-		default:
-			return NULL;
-	}
 }

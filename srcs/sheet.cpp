@@ -32,25 +32,6 @@ Sheet& Sheet::operator=(const Sheet& sh){
 	return *this;
 }
 
-int Sheet::colNumber(std::string str) {
-	int col = 0;
-	for (char c : str) {
-		if (!std::isalpha(c))
-			throw syntax_error("invalid column name");
-		col = col*26 + std::tolower(c) - 'a' + 1;
-	}
-	return col;
-}
-
-std::string Sheet::colLetter(int n) {
-	std::string col = "";
-	while (n > 0){
-		col.insert(0, 1, (char)(n%26 + 'a' - 1));
-		n = n/26;
-	}
-	return col;
-}
-
 ExprPointer* Sheet::parseCell(int col, int row) const {
 	if (checkRow(row) && checkCol(col)) {
 		return &(table[(row-1)*width + col -1]); //indexing from 0
@@ -129,4 +110,23 @@ void Sheet::printExpr(std::ostream& os) const {
 		}
 		os << std::endl;
 	}
+}
+
+int Sheet::colNumber(std::string str) {
+	int col = 0;
+	for (char c : str) {
+		if (!std::isalpha(c))
+			throw syntax_error("invalid column name");
+		col = col*26 + std::tolower(c) - 'a' + 1;
+	}
+	return col;
+}
+
+std::string Sheet::colLetter(int n) {
+	std::string col = "";
+	while (n > 0){
+		col.insert(0, 1, (char)(n%26 + 'a' - 1));
+		n = n/26;
+	}
+	return col;
 }

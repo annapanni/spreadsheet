@@ -35,7 +35,7 @@ public:
 */
 template <typename T>
 class DataToken : public Token {
-	T content;
+	T content; ///<a token adattartalma
 public:
 	DataToken(Token_type tt, T s) : Token(tt), content(s) {} ///<konstruktor típus és adat megadásával
 	T getContent() const {return content;} ///<belső adat lekérdezése

@@ -1,9 +1,7 @@
 #ifndef EXCEPTION_HPP
 #define EXCEPTION_HPP
 
-
 #include <exception>
-
 
 /**
 *Saját exception osztály a szintaktikailag helytelen kifejezések értelmezésénél felmerülő hibákra.

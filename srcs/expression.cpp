@@ -157,3 +157,18 @@ Operator& Operator::operator=(const Operator& op){
 	}
 	return *this;
 }
+
+Operator* Operator::operandFromToken(Token_type tt, Expression* lhs, Expression* rhs){
+	switch (tt) {
+		case PLUS:
+			return new Add(lhs, rhs);
+		case MINUS:
+			return new Sub(lhs, rhs);
+		case STAR:
+			return new Mult(lhs, rhs);
+		case SLASH:
+			return new Div(lhs, rhs);
+		default:
+			return NULL;
+	}
+}

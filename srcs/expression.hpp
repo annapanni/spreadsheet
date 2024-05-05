@@ -8,6 +8,7 @@
 #include "expression_core.hpp"
 #include "sheet.hpp"
 #include "exceptions.hpp"
+#include "token.hpp"
 
 ///Cellát azonosító sor- és oszlopadat eltárolására szolgáló osztály.
 class CellId {
@@ -125,14 +126,14 @@ public:
 	void checkCyclic(std::vector<Expression*>) const;
 	void shift(int dx, int dy) {range.shift(dx, dy);}
 	void relocate(Sheet* shp) {range.relocate(shp);}
+		///<létrehoz egy megfelelő típusú függvényt a neve alapján
+	virtual ~FunctionExpr(){}
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
 		return INVALID;
 	} ///<értelmezi a függvények neveit (case sensitive)
 	static FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell);
-		///<létrehoz egy megfelelő típusú függvényt a neve alapján
-	virtual ~FunctionExpr(){}
 };
 
 ///tartomány átlagát vevő függvény osztály
@@ -171,6 +172,8 @@ public:
 		delete lhs;
 		delete rhs;
 	} ///<felszabadítja az operandusait
+	static Operator* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs);
+		///<adott tokentípusnak megfelelő műveletet hoz létre
 };
 
 ///szorzás műveletet reprezentáló osztály
