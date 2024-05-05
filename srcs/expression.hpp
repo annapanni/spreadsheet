@@ -11,6 +11,7 @@
 #include "token.hpp"
 
 ///Cellát azonosító sor- és oszlopadat eltárolására szolgáló osztály.
+/** oszlop és sorindexeket is 1-től indexelve tárolja, paraméterként is így várja.*/
 class CellId {
 	int colNum; ///<oszlop sorszáma 1-től indexelve
 	int row; ///<sorszám 1-től indexelve
@@ -26,18 +27,33 @@ public:
 };
 
 ///Cellahivatkozást reprezentáló kifejezés osztály.
+/**A hivatkozás egy tábla (Sheet) egy cellájára mutathat oszlop és sor megadásával.
+Mind az oszlopa, mind a sora egymástól független lehetnek abszolútak.*/
 class CellRefExpr : public Expression {
 	CellId cell; ///<cellát azonosító sor- és oszlopadat
 	Sheet* sh; ///<tábla, amelyre a hivatkozás mutat
 	bool absCol; ///<oszlopát tekintve abszolút-e a hivatkozás
 	bool absRow; ///<sorát tekintve abszolút-e a hivatkozás
 public:
+	///konstruktor oszlopjelölő betű és sorszám megadásával
+	/**
+	@param col - oszlopbetű
+	@param row - sorszám
+	@param sh - tábla, amelyre a hivatkozás mutat
+	@param absCol - abszolút hivatkozás-e az oszlop
+	@param absRow - abszolút hivatkozás-e a sor
+	 */
 	CellRefExpr(std::string col, int row, Sheet* sh = NULL, bool absCol=false, bool absRow=false)
 		: cell(CellId(col, row)), sh(sh), absCol(absCol), absRow(absRow) {}
-		///<konstruktor oszlopjelölő betű és sorszám megadásával és privát adattagok inicializálásával
+	///konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel
+	/**
+	@param str - cella jelölője ("[oszlopbetű][sorszám]")
+	@param sh - tábla, amelyre a hivatkozás mutat
+	@param absCol - abszolút hivatkozás-e az oszlop
+	@param absRow - abszolút hivatkozás-e a sor
+	 */
 	CellRefExpr(std::string str, Sheet* sh = NULL, bool absCol=false, bool absRow=false)
 		: cell(CellId(str)), sh(sh), absCol(absCol), absRow(absRow) {}
-		///<konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel és privát adattagok inicializálásával
 	std::string getCol() const {return cell.colLetter();} ///<oszlopbetű lekérdezése
 	int getRow() const {return cell.getRow();} ///<sorszám lekérdezése
 	Sheet* getSheet() const {return sh;} ///<hivatkozás által mutatott tábla lekérdezése
@@ -48,20 +64,20 @@ public:
 	bool getAbsRow() const {return absRow;} ///<sor abszolút voltának lekérdezése
 	double eval() const; ///<hivatkozás által mutatott cella kiértékelése
 	void checkCyclic(std::vector<Expression*>) const;
-		///<ellenőrzi, tartalmaz-e a kifejezés ciklikus referenciát ld. Expression::checkCyclic
 	std::string show() const {return (absCol?"$":"") + cell.colLetter() + (absRow?"$":"") + std::to_string(cell.getRow());}
-		 ///<kifejezés megjelenítése std::string-ként
-	CellRefExpr* copy() const {return new CellRefExpr(*this);} ///<dinamikusan foglalt memóriaterületen visszaadott másolat
+	CellRefExpr* copy() const {return new CellRefExpr(*this);}
 	///Eltolja a hivatkozást adott sorral és oszloppal, amennyiben a sor/oszlop nem abszolút
 	/**
 	@param dx - sor eltolásának mértéke (akár negatív)
 	@param dy - oszlop eltolásának mértéke (akár negatív)
 	*/
 	void shift(int dx, int dy);
-	void relocate(Sheet* shp) {sh = shp;} ///<a kifejezésben található hivatkozások célpontját áthelyezi egy másik számolótáblára
+	void relocate(Sheet* shp) {sh = shp;} ///<a cellahivatkozás célpontját áthelyezi egy másik számolótáblára
 };
 
 ///Cellahivatkozások egy téglalap alakú tartományát reprezentáló osztály
+/**A téglalapot a bal felső és jobb alsó cellája határozza meg, és elvárás, hogy
+ez a két cella egy számolótáblán legyen. */
 class Range {
 	CellRefExpr* topCell;
 		///<a tartomány bal felső cellájára vonatkozó hivatkozás, elvárás, hogy ez azonos táblán legyen, mint a jobb alsó cellahivatkozás
@@ -72,7 +88,8 @@ public:
 	///konstruktor a tartomány két sarokcellájára mutató hivatkozás megadásával
 	/**A két megadott sarokcella-hivatkozás bármely sorrendben, bármely átló szerint megadható,
 	azonban a range mindig bal felső - jobb felső sorrendben tárolja el őket.
-	Ezért a konstruktor új referenciákat készít és ezeket tárolja el végül.
+	Ezért a konstruktor új referenciákat készít és ezeket tárolja el végül és bejárni
+	is a bal felső cellából kezdi így a bejárást.
 	*/
 	Range(CellRefExpr* bg, CellRefExpr* ed);
 	Range(const Range& r) : topCell(r.topCell->copy()), bottomCell(r.bottomCell->copy()) {}
@@ -90,7 +107,7 @@ public:
 		delete topCell;
 		delete bottomCell;
 	} ///<sarokcella hivatkozások felszabadítása
-	///tartományt sorfolytonosan bejáró iterátor
+	///Tartományt sorfolytonosan bejáró iterátor
 	class iterator {
 		size_t rangeWidth; ///<tartomány szélessége (bejáráshoz szükséges)
 		size_t tableWidth; ///<tábla szélessége (bejáráshoz szükséges)
@@ -98,14 +115,21 @@ public:
 		ExprPointer* actCell; ///<aktuális cellára mutató pointer
 	public:
 		iterator() : rangeWidth(0), tableWidth(0), actRow(NULL), actCell(NULL) {} ///<üres iterátor létrehozása
+		///konstruktor
+		/**
+		csak a tartománybeli sorok elejéről lehet indítani az iterátort
+		@param rw - a bejárandó tartomány szélessége
+		@param tw - a bejárandó tartományt taralmazó tábla szélessége
+		@param bp - a cella, melyre az iterátor kezdetben mutat
+		*/
 		iterator(size_t rw, size_t tw, ExprPointer* bp)
-			: rangeWidth(rw), tableWidth(tw), actRow(bp), actCell(bp) {} ///< konstruktor
+			: rangeWidth(rw), tableWidth(tw), actRow(bp), actCell(bp) {}
 		ExprPointer& operator*() const {if (actCell==NULL) throw std::runtime_error("empty iterator"); return *actCell;}
-		///<iterátor tartalmának kiolvasása, runtime_error-t dob ha üres iterátorból olvasunk
+			///<iterátor tartalmának kiolvasása, runtime_error-t dob ha üres iterátorból olvasunk
 		ExprPointer* operator->() const {return actCell;} ///<iterátor tartalmának tagjainak elérése
 		bool operator==(const ExprPointer* ep) const {return actCell == ep;} ///<egyenlőség ExprPointer*-el
-		bool operator==(const iterator& it) const {return actCell == it.actCell;} ///<egyenlőség másik iterátorral
-		bool operator!=(const iterator& it) const {return actCell != it.actCell;} ///<egyenlőtlenség másik iterátorral
+		bool operator==(const iterator& it) const {return actCell == it.actCell;} ///<egyenlőség egy másik iterátorral
+		bool operator!=(const iterator& it) const {return actCell != it.actCell;} ///<egyenlőtlenség egy másik iterátorral
 		iterator& operator++(); ///<preinkremens
 		iterator operator++(int); ///<posztinkremens
 	};
@@ -126,7 +150,6 @@ public:
 	void checkCyclic(std::vector<Expression*>) const;
 	void shift(int dx, int dy) {range.shift(dx, dy);}
 	void relocate(Sheet* shp) {range.relocate(shp);}
-		///<létrehoz egy megfelelő típusú függvényt a neve alapján
 	virtual ~FunctionExpr(){}
 	static FunctionName parseFname(std::string name){
 		if (name == "avg") return AVG;
@@ -134,9 +157,10 @@ public:
 		return INVALID;
 	} ///<értelmezi a függvények neveit (case sensitive)
 	static FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell);
+		///<létrehoz egy megfelelő típusú függvényt a neve alapján
 };
 
-///tartomány átlagát vevő függvény osztály
+///Tartomány átlagát vevő függvény osztály
 class AvgFunc : public FunctionExpr {
 public:
 	AvgFunc(Range r) : FunctionExpr(r) {}
@@ -146,7 +170,7 @@ public:
 	Expression* copy() const {return new AvgFunc(range);}
 };
 
-///tartományt összegző függvény osztály
+///Tartományt összegző függvény osztály
 class SumFunc : public FunctionExpr {
 public:
 	SumFunc(Range r) : FunctionExpr(r) {}
@@ -162,7 +186,12 @@ protected:
 	Expression* lhs; ///<bal oldali operandus
 	Expression* rhs; ///<jobb oldali operandus
 public:
-	Operator(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {} ///<konstruktor
+	///konstruktor
+	/**
+	@param lhs - bal oldali operandus
+	@param rhs - jobb oldali operandus
+	*/
+	Operator(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
 	Operator(const Operator& op) : lhs(op.lhs->copy()), rhs(op.rhs->copy()) {} ///<másoló konstruktor
 	Operator& operator=(const Operator& op); ///<értékadás operátor
 	void checkCyclic(std::vector<Expression*> ps) const {lhs->checkCyclic(ps); rhs->checkCyclic(ps);}
@@ -176,7 +205,7 @@ public:
 		///<adott tokentípusnak megfelelő műveletet hoz létre
 };
 
-///szorzás műveletet reprezentáló osztály
+///Szorzás műveletet reprezentáló osztály
 class Mult : public Operator {
 public:
 	Mult(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
@@ -185,7 +214,7 @@ public:
 	Expression* copy() const {return new Mult(lhs->copy(), rhs->copy());}
 };
 
-///osztás műveletet reprezentáló osztály
+///Osztás műveletet reprezentáló osztály
 class Div : public Operator {
 public:
 	Div(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
@@ -194,7 +223,7 @@ public:
 	Expression* copy() const {return new Div(lhs->copy(), rhs->copy());}
 };
 
-///összeadás műveletet reprezentáló osztály
+///Összeadás műveletet reprezentáló osztály
 class Add : public Operator {
 public:
 	Add(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
@@ -203,7 +232,7 @@ public:
 	Expression* copy() const {return new Add(lhs->copy(), rhs->copy());}
 };
 
-///kivonás műveletet reprezentáló osztály
+///Kivonás műveletet reprezentáló osztály
 class Sub : public Operator {
 public:
 	Sub(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}

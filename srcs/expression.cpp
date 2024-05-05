@@ -66,6 +66,22 @@ Range& Range::operator=(const Range& r){
 	return *this;
 }
 
+Range::iterator Range::begin() const{
+	Sheet* sh = topCell->getSheet();
+	ExprPointer* bp = topCell->getPtr();
+	ExprPointer* ep = bottomCell->getPtr();
+	size_t rangeWidth = (ep - bp) % (int)(sh->getWidth());
+	return iterator(rangeWidth, sh->getWidth(), bp);
+}
+
+Range::iterator Range::end() const{
+	Sheet* sh = topCell->getSheet();
+	ExprPointer* bp = topCell->getPtr();
+	ExprPointer* ep = bottomCell->getPtr();
+	size_t rangeWidth = (ep - bp) % (int)sh->getWidth();
+	return iterator(rangeWidth, sh->getWidth(), ep-rangeWidth+sh->getWidth());
+}
+
 //Range iterator fuctions ------------------------------------------------------
 Range::iterator& Range::iterator::operator++() {//preinkremens
 	if (actCell == NULL)
@@ -83,22 +99,6 @@ Range::iterator Range::iterator::operator++(int) {//posztinkremens
 	iterator tmp = *this;
 	operator++();
 	return tmp;
-}
-
-Range::iterator Range::begin() const{
-	Sheet* sh = topCell->getSheet();
-	ExprPointer* bp = topCell->getPtr();
-	ExprPointer* ep = bottomCell->getPtr();
-	size_t rangeWidth = (ep - bp) % (int)(sh->getWidth());
-	return iterator(rangeWidth, sh->getWidth(), bp);
-}
-
-Range::iterator Range::end() const{
-	Sheet* sh = topCell->getSheet();
-	ExprPointer* bp = topCell->getPtr();
-	ExprPointer* ep = bottomCell->getPtr();
-	size_t rangeWidth = (ep - bp) % (int)sh->getWidth();
-	return iterator(rangeWidth, sh->getWidth(), ep-rangeWidth+sh->getWidth());
 }
 
 //FunctionExpr fuctions ------------------------------------------------------

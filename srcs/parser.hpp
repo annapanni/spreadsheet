@@ -16,13 +16,13 @@ A parser osztályt egy std::string-el inicializáljuk, amit a Parser konstruktor
 Parser a parse tagfüggvényének segítségével megpróbálja értelmezni az adott kifejezést, és
 amennyiben ez lehetséges (azaz a kifejezés szintaktikailag helyes), létre is hozza a kifejezést
 dinamikus memóriaterületen, különben syntax_error típusú kivételt dob. A kifejezés értelmezése az
-alábbi szabályok alapján zajlik:
-	expression     → factor ( ( "-" | "+" ) factor )* ;
-	factor         → unary ( ( "/" | "*" ) unary )* ;
-	unary          → "-" unary | function | primary;
-	function       → STRING "(" cell ":" cell ")" ;
-	cell           → ('$')? STRING ('$' NUMBER)?
-	primary        → NUMBER | "(" expression ")" | cell;
+alábbi szabályok alapján zajlik:\n
+	expression     → factor ( ( "-" | "+" ) factor )* ;\n
+	factor         → unary ( ( "/" | "*" ) unary )* ;\n
+	unary          → "-" unary | function | primary;\n
+	function       → STRING "(" cell ":" cell ")";\n
+	cell           → ('$')? STRING ('$' NUMBER)?;\n
+	primary        → NUMBER | "(" expression ")" | cell;\n
 Minden ilyen fent leírt szabályhoz tartozik egy-egy tagfüggvény, amelyeknek feladata, hogy a
 tokenlistának éppen aktív (current) tokenjétől kezdve megpróbáljon értelmezni egy megfelelő
 típusú kifejezést, ha ez lehetséges, akkor az ehhez szükséges tokeneket “elfogyasztja”, így a
@@ -32,6 +32,9 @@ hogy a parse függvény igazából csak annyit tesz, hogy az első tokent állí
 A kifejezések értelmezésének pontos menetének megvalósításához a program Robert Nystrom:
 Crafting Interpreters c. könyvéből merít ihletet, amely az alábbi linken elérhető:
 https://craftinginterpreters.com.
+
+Megj.: az "-" unary mintára illeszkedő egy -1-el való szorzásra fordítja a parser, minden
+más mintának saját osztálya van
 */
 class Parser {
 	std::vector<Token*> tokens; ///<az értelmezni kívánt kifejezés tokenizált alakban
@@ -43,26 +46,19 @@ class Parser {
 		///<ellenőrzi a jelenlegi token egy adott típusú-e
 	bool match(Token_type tt);
 		///<ellenőrzi a jelenlegi token egy adott típusú-e, ha igen, akkor tovább lépteti a feldolgozást
+	///megpróbálja "elfogyasztani" a jelenlegi tokent ha az az adott típusú
 	/**
 	@param tt - elfogyasztani kívánt tokentípus
 	@param msg - ha a jelenlegi token nem az adott típusú ez az üzenet kerül a syntax_error belsejébe
 	*/
 	Token* consume(Token_type tt, const char* msg);
-		///<megpróbálja "elfogyasztani" a jelenlegi tokent ha az az adott típusú
 
-	/** @param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	Expression* expression(Sheet* shp = NULL); ///<a jelenlegi tokentől kezdve megpróbál egy expression-t értelmezni és létrehozni
-	/** @param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	Expression* factor(Sheet* shp = NULL); ///<a jelenlegi tokentől kezdve megpróbál egy factor-t értelmezni és létrehozni
-	/** a "-" unary mintára illeszkedő kifejezéseket egy -1-el való szorzással valósítja meg a függvény*/
-	/** @param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	Expression* unary(Sheet* shp = NULL); ///<a jelenlegi tokentől kezdve megpróbál egy unary-t értelmezni és létrehozni
-	/** @param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	Expression* function(Sheet* shp = NULL); ///<a jelenlegi tokentől kezdve megpróbál egy function-t értelmezni és létrehozni
-	/** @param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	Expression* primary(Sheet* shp = NULL); ///<a jelenlegi tokentől kezdve megpróbál egy primary-t értelmezni és létrehozni
-	/** @param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	CellRefExpr* cell(Sheet* shp = NULL); ///<a jelenlegi tokentől kezdve megpróbál egy cell-t értelmezni és létrehozni
+	Expression* expression(Sheet* shp = NULL);
+	Expression* factor(Sheet* shp = NULL);
+	Expression* unary(Sheet* shp = NULL);
+	Expression* function(Sheet* shp = NULL);
+	Expression* primary(Sheet* shp = NULL);
+	CellRefExpr* cell(Sheet* shp = NULL);
 public:
 	Parser(std::string input); ///<konstruktor: a megadott stringet tokenlistává alakítja
 	Parser& operator=(const Parser& p); ///<értékadó operátor
@@ -70,18 +66,18 @@ public:
 
 	void addToken(Token_type t); ///<hozzáad a tokenek listájához egy megadott típusú tokent
 	void addToken(std::string s);
-		///<hozzáad a tokenek listájához egy STRING típusú adattokent a paraméterként megadott stringgel, mint belső adat
+		///<hozzáad a tokenek listájához egy STRING típusú adattokent a paraméterként megadott stringgel mint belső adat
 	void addToken(double n);
-		///<hozzáad a tokenek listájához egy NUMBER típusú adattokent a paraméterként megadott számmal, mint belső adat
+		///<hozzáad a tokenek listájához egy NUMBER típusú adattokent a paraméterként megadott számmal mint belső adat
 	void addTokenFromStr(std::string& str_buffer);
 		///<megpróbál kiolvasni egy számot a kapott stringből, ha sikeresen, akkor hozzádja NUMBER tokenként, ha nem akkor STRING tokenként
 
+	///kifejezés értelmezése
 	/**
 	megpróbálja értelmezni a kifejezést az elejétől, ha sikertelen, syntax_error kivételt dob
 	@param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	Expression* parse(Sheet* shp = NULL); ///< kifejezés értelmezése
+	Expression* parse(Sheet* shp = NULL);
 	/**
-	megpróbálja értelmezni a kifejezést az elejétől, ha sikertelen, syntax_error kivételt dob
 	ha sikeres, akkor az adott tábla adott cellájába berakja a kifejezést
 	@param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni
 	@param ep - az értelmezett kifejezés ebbe a cellába kerül

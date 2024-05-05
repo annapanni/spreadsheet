@@ -13,9 +13,7 @@ enum Token_type {
 	DOLLAR, NUMBER, STRING
 };
 
-///Tokenek osztálya.
-/**Az kifejezés értelmező ezen osztály példányaival tárolja el a kifejezéseket
-*/
+///Tokenek osztálya: Az kifejezés értelmező ezen osztály példányaival tárolja el a kifejezéseket
 class Token {
 protected:
 	Token_type type; ///<token típusa

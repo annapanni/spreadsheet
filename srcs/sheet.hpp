@@ -20,12 +20,13 @@ class Sheet {
 public:
 	Sheet() : table(NULL), width(0), height(0) {} ///<konstruktor
 	Sheet(const Sheet&); ///<másoló konstruktor
+	///konstruktor adott számmal inicializálással
 	/**
 	@param w - létrehozandó tábla szélessége
 	@param h - létrehozandó tábla magassága
 	@param fill - a létrejövő tábla minden celláját ezzel a számmal inicializálja
 	*/
-	Sheet(size_t w, size_t h, double fill = 0); ///<konstruktor adott számmal inicializálással
+	Sheet(size_t w, size_t h, double fill = 0);
 	size_t getWidth() const {return width;} ///<tábla szélességének lekérdezése
 	size_t getHeight() const {return height;}  ///<tábla magasságának lekérdezése
 	Sheet& operator=(const Sheet&); ///<értékadó operátor
@@ -47,12 +48,13 @@ public:
 		///<visszaadja, hogy egy adott cellára mutató pointer melyik sorban van (0-tól indexelve)
 	int getXCoord(ExprPointer* cell) const;
 		///<visszaadja, hogy egy adott cellára mutató pointer melyik oszlopban van (0-tól indexelve)
+	///átmásolja a tábla tartalmát egy másik, paraméterként kapott táblába
 	/**
 	a paraméterként kapott tábla mérete nem változik meg, tehát ha kisebb volt,
 	akkor az adatok részét nem másolja át, ha nagyobb volt, akkor a paraméterként
 	kapott tábla fennmaradó részében az adatok változatlanok maradnak
 	*/
-	void copyTo(Sheet& sh) const; ///<átmásolja a tábla tartalmát egy másik, paraméterként kapott táblába
+	void copyTo(Sheet& sh) const;
 	/**
 	Ha kisebbre méretezzük a táblát, akkor az adatok egy része elveszik, ha nagyobbra,
 	akkor a fill paraméterben megadott számmal tölti ki az újonnan keletkező részt

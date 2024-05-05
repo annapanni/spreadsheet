@@ -24,37 +24,40 @@ class Console {
 	std::istream& is; ///<a parancsok nevét és paramétereit innen olvassa a konzol
 	bool closed = false; ///<bezárták-e a konzolt
 public:
-	Console() : os(std::cout), is(std::cin) {} ///<alapértelmezett konstruktor, input és outputstream-je a cin és cout
+	Console() : os(std::cout), is(std::cin) {}
+		///<alapértelmezett konstruktor, input és outputstream-je a std::cin és std::cout
 	Console(Sheet sh, std::ostream& os, std::istream& is) : sh(sh), os(os), is(is) {}
 		///<konstruktor tábla, input- és outputstreamek megadásával
 	Console(std::ostream& os, std::istream& is) : os(os), is(is) {}
 		///<konstruktor csak input- és outputstreamek megadásával
 
 	bool isClosed() const {return closed;} ///<visszaadja, bezárták-e a konzolt
-
 	void help(); ///<kiírja az os-re az elérhető parancsokat
 
+	///új táblát hoz létre (ha volt előző, azt eldobja)
 	/**paramétereit az is-ről olvassa: új tábla szélesség és magassága*/
-	void createNew(); ///<új táblát hoz létre (ha volt előző, azt eldobja)
+	void createNew();
+	///átméretezi a táblát, ha kisebb lesz, a fennmaradó adat elveszik
 	/**paramétereit az is-ről olvassa: tábla új szélesség és magassága*/
-	void resize(); ///<átméretezi a táblát, ha kisebbre lesz, a fennmaradó adat elveszik
+	void resize();
 	void print() {sh.formattedPrint(os);} ///<kiírja az os-re a tábla tartalmát oszlop- és sorszámokkal
 	void exportValues(); ///<is-ről bekért fájlnevű fájlba kiírja a táblában tárolt értékeket vesszővel elválasztva
 	void save(); ///<is-ről bekért fájlnevű fájlba kiírja a táblában tárolt kifejezéseket vesszővel elválasztva
 	void load(); ///<is-ről bekért fájlnevű fájlból beolvassa a vesszővel elválasztott kifejezéseket
 	void set(); ///<is-ről bekért cellába beállítja a megadott kifejezést (amennyiben szintaktikailag helyes)
+	///automatikusan kitölti a kezdőcellában található értékkel a cellákat a második paraméterben kapott celláig egy téglalapban
 	/**
 	a kezdőcellában található kifejezést átmásolja a két cella által meghatározott
 	téglalap minden cellájába, ezen felül minden nem abszolút hivatkozást eltol a kezdőcellától
 	vett relatív pozíciójának megfelelően (ld. CellRefExpr::shift)
 	*/
 	void pull();
-		///<automatikusan kitölti a kezdőcellában található értékkel a cellákat a második paraméterben kapott celláig egy téglalapban
 	void show(); ///<kiírja az os-re a is-ről olvasott cella tartalmát és értékét
 	void exit() {closed = true;} ///<bezárja a konzolt
 
+	///beolvassa és értelmezi az is-re beírt parancs nevét, és meghívja a megfelelő tagfüggvényt
 	/**ha helytelen parancsnevet kap, hibaüzenetet ír az os-re*/
-	void readCommand(); ///<beolvassa és értelmezi az is-re beírt parancs nevét, és meghívja a megfelelő tagfüggvényt
+	void readCommand();
 };
 
 

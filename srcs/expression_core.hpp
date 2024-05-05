@@ -11,7 +11,7 @@ class Sheet;
 ///Kifejezések absztrakt alaposztálya.
 class Expression {
 public:
-	///rekuzívan kiértékeli a kifejezést.
+	///rekurzívan kiértékeli a kifejezést.
 	/**kiértékelés közben eval_error típusa kivételt dobhat*/
 	virtual double eval() const = 0;
 	///ellenőrzi, tartalmaz-e a kifejezés ciklikus referenciát
@@ -19,7 +19,7 @@ public:
 	@param ps - a kifejezésben korábban hivatkozott cellák, amire ismét hivatkozva körkörös hivatkozást kapunk
 	*/
 	virtual void checkCyclic(std::vector<Expression*>) const = 0;
-	///rekuzívan kiértékeli a kifejezést, körkörös hivatkozásra is eval_error hibát dob
+	///rekurzívan kiértékeli a kifejezést, körkörös hivatkozásra is eval_error hibát dob
   /**
 	@param ps - a kifejezésben korábban hivatkozott cellák, amire ismét hivatkozva körkörös hivatkozást kapunk
 	*/
@@ -36,23 +36,23 @@ public:
 *Az Expression absztrakt osztályból származtatott osztályok példányait heterogén
 kollekciókban pointerként tudjuk tárolni. Azonban ilyenkor ügyelni kell a dinamikusan
 foglalt memóriaterületekre, a pointerek másolására, értékadásra. Az ExprPointer
-osztály ezt hivatott lekezelni, azáltal hogy a másolja és felszabadítja a pointerket,
+osztály ezt hivatott lekezelni, azáltal, hogy a másolja és felszabadítja a pointereket,
 de az eredeti funkciójukat is megtartja. Így minden kifejezést gyakorlatilag sima
 osztálypéldányként tudunk kezelni (pointer helyett).
 */
 class ExprPointer {
 	Expression* ep; ///<az osztály által becsomagolt pointer
 public:
-	ExprPointer(Expression* p = NULL) : ep(p) {} ///<konstruktor pointer inincializálásával
+	ExprPointer(Expression* p = NULL) : ep(p) {} ///<konstruktor pointer inicializálásával
 	ExprPointer(const ExprPointer& rhs) : ep(rhs.ep->copy()) {} ///<másoló konstruktor
 	operator Expression*() const {return ep;} ///<castolás Expression*-ra
-	ExprPointer& operator=(const ExprPointer& rhs) { ///<értékadás a másik kifejezés rekuzív másolásával
+	ExprPointer& operator=(const ExprPointer& rhs) {
 		if (&rhs != this) {
 			delete ep;
 			ep = rhs.ep->copy();
 		}
 		return *this;
-	}
+	} ///<értékadás a másik kifejezés rekurzív másolásával
 	bool operator==(const ExprPointer& rhs) const {return ep == rhs.ep;} ///<egyenlőség másik ExprPointer-el
 	bool operator==(Expression* p) {return ep == p;} ///<egyenlőség Expression*-al
 	Expression* operator->() const {return ep;} ///<becsomagolt pointer adatainak és függvényeinek elérése nyíllal
@@ -67,9 +67,9 @@ class NumberExpr : public Expression {
 public:
 	NumberExpr(double v) : value(v) {} ///<konstruktor
 	double eval() const {return value;} ///<kifejezés kiértékelése - érték visszaadása
-	void checkCyclic(std::vector<Expression*>) const {} ///<körkörös hivatkozás keresése - ez az oszály sosem dob kivételt
-	Expression* copy() const {return new NumberExpr(value);} ///<dinamikusan foglalt memóriaterületen visszaadott másolat
-	std::string show() const {std::ostringstream ss; ss << value; return ss.str();} ///<szám megjelenítése std::string-ként
+	void checkCyclic(std::vector<Expression*>) const {}
+	Expression* copy() const {return new NumberExpr(value);}
+	std::string show() const {std::ostringstream ss; ss << value; return ss.str();}
 };
 
 #endif
