@@ -8,6 +8,30 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 function(add_compile_options target)
     target_compile_options(${target} PRIVATE
+            # Ezeket kapcsold be!:
+            #            -Werror
+            #            -Wall
+            #            -Wextra
+            #            -Wpedantic
+            #            -Wconversion
+    )
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_compile_options(${target} PRIVATE
+                -fsanitize=address
+                -fno-omit-frame-pointer
+        )
+        target_link_options(${target} PRIVATE
+                -fsanitize=address
+        )
+    endif ()
+endfunction()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+
+function(add_compile_options target)
+    target_compile_options(${target} PRIVATE
             -Werror
             -Wall
             -Wextra
