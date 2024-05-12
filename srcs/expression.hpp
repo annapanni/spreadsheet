@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <optional>
 
 #include "expression_core.hpp"
 #include "sheet.hpp"
@@ -137,7 +138,7 @@ public:
 
 ///elérhető függvények nevei
 enum FunctionName {
-	INVALID, AVG, SUM
+	AVG, SUM
 };
 
 ///Tartományon elvégezhető függvénykifejezések absztrakt osztálya
@@ -151,10 +152,10 @@ public:
 	void shift(int dx, int dy) {range.shift(dx, dy);}
 	void relocate(Sheet* shp) {range.relocate(shp);}
 	virtual ~FunctionExpr(){}
-	static FunctionName parseFname(std::string name){
+	static std::optional<FunctionName> parseFname(std::string name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
-		return INVALID;
+		return {};
 	} ///<értelmezi a függvények neveit (case sensitive)
 	static FunctionExpr* newFunctionExpr(FunctionName fn, CellRefExpr* topCell, CellRefExpr* bottomCell);
 		///<létrehoz egy megfelelő típusú függvényt a neve alapján

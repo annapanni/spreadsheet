@@ -56,7 +56,7 @@ public:
 	bool operator==(const ExprPointer& rhs) const {return ep == rhs.ep;} ///<egyenlőség másik ExprPointer-el
 	bool operator==(Expression* p) {return ep == p;} ///<egyenlőség Expression*-al
 	Expression* operator->() const {return ep;} ///<becsomagolt pointer adatainak és függvényeinek elérése nyíllal
-	virtual double evalMe() {return ep->safeEval({ep});}
+	double evalMe() {return ep->safeEval({ep});}
 		///<kiértékeli az adott kifejezést úgy, hogy, a körkörös hivatkozások keresése tőle indul
 	~ExprPointer() {delete ep;} ///<felszabadítja a pointert
 };

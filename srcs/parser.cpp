@@ -133,9 +133,9 @@ Expression* Parser::function(Sheet* shptr){
 	size_t c = current;
 	if (match(STRING)) {
 		std::string fnameStr = dynamic_cast<DataToken<std::string>*>(prev())->getContent(); //bad cast
-		FunctionName fname = FunctionExpr::parseFname(fnameStr);
+		std::optional<FunctionName> fname = FunctionExpr::parseFname(fnameStr);
 		if (match(LEFT_BR)) {
-			if (fname == INVALID)
+			if (!fname)
 				throw syntax_error("invalid function name");
 			CellRefExpr* c1 = nullptr;
 			CellRefExpr* c2 = nullptr;
@@ -150,7 +150,7 @@ Expression* Parser::function(Sheet* shptr){
 				throw;
 			}
 			if (c1!=nullptr && c2!=nullptr) {
-				return FunctionExpr::newFunctionExpr(fname, c1, c2);
+				return FunctionExpr::newFunctionExpr(fname.value(), c1, c2);
 			} else {
 				delete c1;
 				delete c2;

@@ -108,7 +108,7 @@ TEST (Expression, Function){
 	delete avg;
 	EXPECT_EQ(FunctionExpr::parseFname("avg"), AVG);
 	EXPECT_EQ(FunctionExpr::parseFname("sum"), SUM);
-	EXPECT_EQ(FunctionExpr::parseFname("ddfas"), INVALID);
+	EXPECT_EQ(FunctionExpr::parseFname("ddfas"), std::optional<FunctionName>{});
 }
 
 TEST (Expression, Mult){
