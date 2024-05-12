@@ -11,7 +11,7 @@ Sheet::Sheet(const Sheet& sh): width(sh.width), height(sh.height){
 	}
 }
 
-Sheet::Sheet(size_t w, size_t h, double fill) : width(w), height(h){
+Sheet::Sheet(size_t width, size_t height, double fill) : width(width), height(height){
 	table = new ExprPointer[width * height];
 	for (size_t i = 0; i < width*height; i++) {
 		table[i] = new NumberExpr(fill);
@@ -38,9 +38,10 @@ ExprPointer* Sheet::parseCell(int col, int row) const {
 	}
 	throw eval_error("index out of range");
 }
+
 ExprPointer* Sheet::parseCell(std::string col, int row) const {
-	int cn = colNumber(col);
-	return parseCell(cn, row);
+	int colnum = colNumber(col);
+	return parseCell(colnum, row);
 }
 
 int Sheet::getYCoord(ExprPointer* cell) const {
@@ -61,8 +62,8 @@ void Sheet::copyTo(Sheet& sh) const {
 	}
 }
 
-void Sheet::resize(size_t w, size_t h, double fill){
-	Sheet sh = Sheet(w, h, fill);
+void Sheet::resize(size_t width, size_t height, double fill){
+	Sheet sh = Sheet(width, height, fill);
 	copyTo(sh);
 	*this = sh;
 }

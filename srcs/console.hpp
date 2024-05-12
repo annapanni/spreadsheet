@@ -20,31 +20,31 @@ el a program által generált kivételeket, és hibaüzenetet ír az outputstrea
 */
 class Console {
 	Sheet sh; ///<a táblázat, amelyen a parancsok végrehajtódnak
-	std::ostream& os; ///<a kimenettel rendelkező parancsok kimenetét ide írja a konzol
-	std::istream& is; ///<a parancsok nevét és paramétereit innen olvassa a konzol
+	std::ostream& ostream; ///<a kimenettel rendelkező parancsok kimenetét ide írja a konzol
+	std::istream& istream; ///<a parancsok nevét és paramétereit innen olvassa a konzol
 	bool closed = false; ///<bezárták-e a konzolt
 public:
-	Console() : os(std::cout), is(std::cin) {}
+	Console() : ostream(std::cout), istream(std::cin) {}
 		///<alapértelmezett konstruktor, input és outputstream-je a std::cin és std::cout
-	Console(Sheet sh, std::ostream& os, std::istream& is) : sh(sh), os(os), is(is) {}
+	Console(const Sheet& sh, std::ostream& ostream, std::istream& istream) : sh(sh), ostream(ostream), istream(istream) {}
 		///<konstruktor tábla, input- és outputstreamek megadásával
-	Console(std::ostream& os, std::istream& is) : os(os), is(is) {}
+	Console(std::ostream& ostream, std::istream& istream) : ostream(ostream), istream(istream) {}
 		///<konstruktor csak input- és outputstreamek megadásával
 
 	bool isClosed() const {return closed;} ///<visszaadja, bezárták-e a konzolt
-	void help(); ///<kiírja az os-re az elérhető parancsokat
+	void help(); ///<kiírja az ostream-re az elérhető parancsokat
 
 	///új táblát hoz létre (ha volt előző, azt eldobja)
-	/**paramétereit az is-ről olvassa: új tábla szélesség és magassága*/
+	/**paramétereit az istream-ről olvassa: új tábla szélesség és magassága*/
 	void createNew();
 	///átméretezi a táblát, ha kisebb lesz, a fennmaradó adat elveszik
-	/**paramétereit az is-ről olvassa: tábla új szélesség és magassága*/
+	/**paramétereit az istream-ről olvassa: tábla új szélesség és magassága*/
 	void resize();
-	void print() {sh.formattedPrint(os);} ///<kiírja az os-re a tábla tartalmát oszlop- és sorszámokkal
-	void exportValues(); ///<is-ről bekért fájlnevű fájlba kiírja a táblában tárolt értékeket vesszővel elválasztva
-	void save(); ///<is-ről bekért fájlnevű fájlba kiírja a táblában tárolt kifejezéseket vesszővel elválasztva
-	void load(); ///<is-ről bekért fájlnevű fájlból beolvassa a vesszővel elválasztott kifejezéseket
-	void set(); ///<is-ről bekért cellába beállítja a megadott kifejezést (amennyiben szintaktikailag helyes)
+	void print() {sh.formattedPrint(ostream);} ///<kiírja az ostream-re a tábla tartalmát oszlop- és sorszámokkal
+	void exportValues(); ///<istream-ről bekért fájlnevű fájlba kiírja a táblában tárolt értékeket vesszővel elválasztva
+	void save(); ///<istream-ről bekért fájlnevű fájlba kiírja a táblában tárolt kifejezéseket vesszővel elválasztva
+	void load(); ///<istream-ről bekért fájlnevű fájlból beolvassa a vesszővel elválasztott kifejezéseket
+	void set(); ///<istream-ről bekért cellába beállítja a megadott kifejezést (amennyiben szintaktikailag helyes)
 	///automatikusan kitölti a kezdőcellában található értékkel a cellákat a második paraméterben kapott celláig egy téglalapban
 	/**
 	a kezdőcellában található kifejezést átmásolja a két cella által meghatározott
@@ -52,11 +52,11 @@ public:
 	vett relatív pozíciójának megfelelően (ld. CellRefExpr::shift)
 	*/
 	void pull();
-	void show(); ///<kiírja az os-re a is-ről olvasott cella tartalmát és értékét
+	void show(); ///<kiírja az ostream-re a istream-ről olvasott cella tartalmát és értékét
 	void exit() {closed = true;} ///<bezárja a konzolt
 
-	///beolvassa és értelmezi az is-re beírt parancs nevét, és meghívja a megfelelő tagfüggvényt
-	/**ha helytelen parancsnevet kap, hibaüzenetet ír az os-re*/
+	///beolvassa és értelmezi az istream-re beírt parancs nevét, és meghívja a megfelelő tagfüggvényt
+	/**ha helytelen parancsnevet kap, hibaüzenetet ír az ostream-re*/
 	void readCommand();
 };
 

@@ -18,15 +18,15 @@ class Sheet {
 	size_t width; ///<tábla szélessége
 	size_t height; ///<tábla magassága
 public:
-	Sheet() : table(NULL), width(0), height(0) {} ///<konstruktor
+	Sheet() : table(nullptr), width(0), height(0) {} ///<konstruktor
 	Sheet(const Sheet&); ///<másoló konstruktor
 	///konstruktor adott számmal inicializálással
 	/**
-	@param w - létrehozandó tábla szélessége
-	@param h - létrehozandó tábla magassága
+	@param width - létrehozandó tábla szélessége
+	@param height - létrehozandó tábla magassága
 	@param fill - a létrejövő tábla minden celláját ezzel a számmal inicializálja
 	*/
-	Sheet(size_t w, size_t h, double fill = 0);
+	Sheet(size_t width, size_t height, double fill = 0);
 	size_t getWidth() const {return width;} ///<tábla szélességének lekérdezése
 	size_t getHeight() const {return height;}  ///<tábla magasságának lekérdezése
 	Sheet& operator=(const Sheet&); ///<értékadó operátor
@@ -59,7 +59,7 @@ public:
 	Ha kisebbre méretezzük a táblát, akkor az adatok egy része elveszik, ha nagyobbra,
 	akkor a fill paraméterben megadott számmal tölti ki az újonnan keletkező részt
 	*/
-	void resize(size_t w, size_t h, double fill = 0); ///<átméretezi a táblát
+	void resize(size_t width, size_t height, double fill = 0); ///<átméretezi a táblát
 
 	void formattedPrint(std::ostream& os = std::cout) const;
 		///<kiértékeli és kiírja a cellák értékét, illetve az oszlop és sorszámokat a kapott ostream-re

@@ -23,7 +23,7 @@ public:
   /**
 	@param ps - a kifejezésben korábban hivatkozott cellák, amire ismét hivatkozva körkörös hivatkozást kapunk
 	*/
-	virtual double safeEval(std::vector<Expression*> ps) const {checkCyclic(ps); return eval();}
+	double safeEval(std::vector<Expression*> prevs) const {checkCyclic(prevs); return eval();}
 	virtual std::string show() const = 0; ///<kifejezés megjelenítése std::string-ként
 	virtual Expression* copy() const = 0; ///<dinamikusan foglalt memóriaterületen visszaadott másolat
 	virtual void shift(int, int) {} ///<rekurzívan minden hivatkozást adott oszlop- és sorszámmal eltol
@@ -43,7 +43,7 @@ osztálypéldányként tudunk kezelni (pointer helyett).
 class ExprPointer {
 	Expression* ep; ///<az osztály által becsomagolt pointer
 public:
-	ExprPointer(Expression* p = NULL) : ep(p) {} ///<konstruktor pointer inicializálásával
+	ExprPointer(Expression* p = nullptr) : ep(p) {} ///<konstruktor pointer inicializálásával
 	ExprPointer(const ExprPointer& rhs) : ep(rhs.ep->copy()) {} ///<másoló konstruktor
 	operator Expression*() const {return ep;} ///<castolás Expression*-ra
 	ExprPointer& operator=(const ExprPointer& rhs) {

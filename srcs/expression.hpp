@@ -31,7 +31,7 @@ public:
 Mind az oszlopa, mind a sora egymástól független lehetnek abszolútak.*/
 class CellRefExpr : public Expression {
 	CellId cell; ///<cellát azonosító sor- és oszlopadat
-	Sheet* sh; ///<tábla, amelyre a hivatkozás mutat
+	Sheet* refSheet; ///<tábla, amelyre a hivatkozás mutat
 	bool absCol; ///<oszlopát tekintve abszolút-e a hivatkozás
 	bool absRow; ///<sorát tekintve abszolút-e a hivatkozás
 public:
@@ -39,26 +39,26 @@ public:
 	/**
 	@param col - oszlopbetű
 	@param row - sorszám
-	@param sh - tábla, amelyre a hivatkozás mutat
+	@param refSheet - tábla, amelyre a hivatkozás mutat
 	@param absCol - abszolút hivatkozás-e az oszlop
 	@param absRow - abszolút hivatkozás-e a sor
 	 */
-	CellRefExpr(std::string col, int row, Sheet* sh = NULL, bool absCol=false, bool absRow=false)
-		: cell(CellId(col, row)), sh(sh), absCol(absCol), absRow(absRow) {}
+	CellRefExpr(std::string col, int row, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
+		: cell(CellId(col, row)), refSheet(refSheet), absCol(absCol), absRow(absRow) {}
 	///konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel
 	/**
 	@param str - cella jelölője ("[oszlopbetű][sorszám]")
-	@param sh - tábla, amelyre a hivatkozás mutat
+	@param refSheet - tábla, amelyre a hivatkozás mutat
 	@param absCol - abszolút hivatkozás-e az oszlop
 	@param absRow - abszolút hivatkozás-e a sor
 	 */
-	CellRefExpr(std::string str, Sheet* sh = NULL, bool absCol=false, bool absRow=false)
-		: cell(CellId(str)), sh(sh), absCol(absCol), absRow(absRow) {}
+	CellRefExpr(std::string str, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
+		: cell(CellId(str)), refSheet(refSheet), absCol(absCol), absRow(absRow) {}
 	std::string getCol() const {return cell.colLetter();} ///<oszlopbetű lekérdezése
 	int getRow() const {return cell.getRow();} ///<sorszám lekérdezése
-	Sheet* getSheet() const {return sh;} ///<hivatkozás által mutatott tábla lekérdezése
-	ExprPointer* getPtr() const {if (sh == NULL) throw eval_error("uninitialized cell");
-		return sh->parseCell(cell.getColNum(), cell.getRow());}
+	Sheet* getSheet() const {return refSheet;} ///<hivatkozás által mutatott tábla lekérdezése
+	ExprPointer* getPtr() const {if (refSheet == nullptr) throw eval_error("uninitialized cell");
+		return refSheet->parseCell(cell.getColNum(), cell.getRow());}
 		///<hivatkozás által mutatott cellára mutató pointer lekérdezése
 	bool getAbsCol() const {return absCol;} ///<oszlop abszolút voltának lekérdezése
 	bool getAbsRow() const {return absRow;} ///<sor abszolút voltának lekérdezése
@@ -72,7 +72,7 @@ public:
 	@param dy - oszlop eltolásának mértéke (akár negatív)
 	*/
 	void shift(int dx, int dy);
-	void relocate(Sheet* shp) {sh = shp;} ///<a cellahivatkozás célpontját áthelyezi egy másik számolótáblára
+	void relocate(Sheet* shp) {refSheet = shp;} ///<a cellahivatkozás célpontját áthelyezi egy másik számolótáblára
 };
 
 ///Cellahivatkozások egy téglalap alakú tartományát reprezentáló osztály
@@ -114,7 +114,7 @@ public:
 		ExprPointer* actRow; ///<aktuális sor kezdőcellájára mutató pointer
 		ExprPointer* actCell; ///<aktuális cellára mutató pointer
 	public:
-		iterator() : rangeWidth(0), tableWidth(0), actRow(NULL), actCell(NULL) {} ///<üres iterátor létrehozása
+		iterator() : rangeWidth(0), tableWidth(0), actRow(nullptr), actCell(nullptr) {} ///<üres iterátor létrehozása
 		///konstruktor
 		/**
 		csak a tartománybeli sorok elejéről lehet indítani az iterátort
@@ -124,7 +124,7 @@ public:
 		*/
 		iterator(size_t rw, size_t tw, ExprPointer* bp)
 			: rangeWidth(rw), tableWidth(tw), actRow(bp), actCell(bp) {}
-		ExprPointer& operator*() const {if (actCell==NULL) throw std::runtime_error("empty iterator"); return *actCell;}
+		ExprPointer& operator*() const {if (actCell==nullptr) throw std::runtime_error("empty iterator"); return *actCell;}
 			///<iterátor tartalmának kiolvasása, runtime_error-t dob ha üres iterátorból olvasunk
 		ExprPointer* operator->() const {return actCell;} ///<iterátor tartalmának tagjainak elérése
 		bool operator==(const ExprPointer* ep) const {return actCell == ep;} ///<egyenlőség ExprPointer*-el
@@ -194,14 +194,14 @@ public:
 	Operator(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
 	Operator(const Operator& op) : lhs(op.lhs->copy()), rhs(op.rhs->copy()) {} ///<másoló konstruktor
 	Operator& operator=(const Operator& op); ///<értékadás operátor
-	void checkCyclic(std::vector<Expression*> ps) const {lhs->checkCyclic(ps); rhs->checkCyclic(ps);}
+	void checkCyclic(std::vector<Expression*> prevs) const {lhs->checkCyclic(prevs); rhs->checkCyclic(prevs);}
 	void shift(int dx, int dy) {lhs->shift(dx, dy); rhs->shift(dx, dy);}
 	void relocate(Sheet* shp) {lhs->relocate(shp); rhs->relocate(shp);}
 	virtual ~Operator(){
 		delete lhs;
 		delete rhs;
 	} ///<felszabadítja az operandusait
-	static Operator* operandFromToken(Token_type tt, Expression* lhs, Expression* rhs);
+	static Operator* operandFromToken(Token_type ttype, Expression* lhs, Expression* rhs);
 		///<adott tokentípusnak megfelelő műveletet hoz létre
 };
 

@@ -53,12 +53,12 @@ class Parser {
 	*/
 	Token* consume(Token_type tt, const char* msg);
 
-	Expression* expression(Sheet* shp = NULL);
-	Expression* factor(Sheet* shp = NULL);
-	Expression* unary(Sheet* shp = NULL);
-	Expression* function(Sheet* shp = NULL);
-	Expression* primary(Sheet* shp = NULL);
-	CellRefExpr* cell(Sheet* shp = NULL);
+	Expression* expression(Sheet* shptr = nullptr);
+	Expression* factor(Sheet* shptr = nullptr);
+	Expression* unary(Sheet* shptr = nullptr);
+	Expression* function(Sheet* shptr = nullptr);
+	Expression* primary(Sheet* shptr = nullptr);
+	CellRefExpr* cell(Sheet* shptr = nullptr);
 public:
 	Parser(std::string input); ///<konstruktor: a megadott stringet tokenlistává alakítja
 	Parser& operator=(const Parser& p); ///<értékadó operátor
@@ -75,14 +75,14 @@ public:
 	///kifejezés értelmezése
 	/**
 	megpróbálja értelmezni a kifejezést az elejétől, ha sikertelen, syntax_error kivételt dob
-	@param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
-	Expression* parse(Sheet* shp = NULL);
+	@param shptr - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni */
+	Expression* parse(Sheet* shptr = nullptr);
 	/**
 	ha sikeres, akkor az adott tábla adott cellájába berakja a kifejezést
-	@param shp - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni
-	@param ep - az értelmezett kifejezés ebbe a cellába kerül
+	@param shptr - ha a kifejezés taralmaz referenciákat, akkor erre a táblára fognak vonatkozni
+	@param target - az értelmezett kifejezés ebbe a cellába kerül
 	*/
-	void parseTo(Sheet* shp, ExprPointer& ep);
+	void parseTo(Sheet* shptr, ExprPointer& target);
 		///<megpróbálja értelmezni a kifejezést az elejétől, ha sikertelen, syntax_error kivételt dob
 	std::string show(); ///<kiírja a tokenlistáját egy std::stringbe
 

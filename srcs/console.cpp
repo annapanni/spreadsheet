@@ -1,7 +1,7 @@
 #include "console.hpp"
 
 void Console::help(){
-	os << "Available commands: \n\
+	ostream << "Available commands: \n\
 	\t new [int w] [int h] - create a new sheet \n\
 	\t resize [int w] [int h] - resize current table \n\
 	\t print - print sheet \n\
@@ -17,48 +17,49 @@ void Console::help(){
 
 void Console::createNew() {
 	size_t w, h;
-	is >> w >> h;
+	istream >> w >> h;
 	sh = Sheet(w, h);
 }
 
 void Console::resize() {
 	size_t w, h;
-	is >> w >> h;
+	istream >> w >> h;
 	sh.resize(w, h);
 }
 
 void Console::exportValues() {
-	std::ofstream of;
+	std::ofstream ofile;
 	try	{
 		std::string fname;
-		is >> fname;
-		of.open(fname + ".csv");
-		sh.printValues(of);
+		istream >> fname;
+		ofile.open(fname + ".csv");
+		sh.printValues(ofile);
 	} catch (...){
-		os << "Export failed\n";
+		ostream << "Export failed\n";
 	}
-	of.close();
+	ofile.close();
 }
+
 void Console::save() {
-	std::ofstream of;
+	std::ofstream ofile;
 	try	{
 		std::string fname;
-		is >> fname;
-		of.open(fname + ".csv");
-		sh.printExpr(of);
+		istream >> fname;
+		ofile.open(fname + ".csv");
+		sh.printExpr(ofile);
 	} catch (...){
-		os << "Export failed\n";
+		ostream << "Export failed\n";
 	}
-	of.close();
+	ofile.close();
 }
 
 void Console::load() {
 	std::ifstream ifile;
 	std::string fname;
 	int w = 0, h = 0;
-	is >> fname;
+	istream >> fname;
 	try	{ifile.open(fname + ".csv");}
-	catch (...) {os << "Load failed\n"; return;}
+	catch (...) {ostream << "Load failed\n"; return;}
 	//counting lines
 	std::string line, word;
 	if (getline(ifile, line)) h++;
@@ -68,7 +69,7 @@ void Console::load() {
 	ifile.close();
 	//opening file again
 	try	{ifile.open(fname + ".csv");}
-	catch (...) {os << "Load failed\n"; return;}
+	catch (...) {ostream << "Load failed\n"; return;}
 	Sheet newsh(w, h, 0);
 	int row = 0;
 	while (getline(ifile, line) && row < h) {
@@ -88,54 +89,54 @@ void Console::load() {
 
 void Console::set() {
 	std::string cellstr;
-	is >> cellstr;
+	istream >> cellstr;
 	try	{
 		CellId cid(cellstr);
 		if (sh.checkRow(cid.getRow()) && sh.checkCol(cid.getColNum())){
 			std::string inp;
-			is >> inp;
+			istream >> inp;
 			Parser(inp).parseTo(&sh, sh[cid.getRow()-1][cid.getColNum()-1]);
 		} else {
-			os << "index out of range\n";
+			ostream << "index out of range\n";
 		}
-	} catch (const syntax_error& err) {os << "syntax error: " << err.what() << std::endl;
-	} catch (const eval_error& err) {os << "evaluation error: " << err.what() << std::endl;}
+	} catch (const syntax_error& err) {ostream << "syntax error: " << err.what() << std::endl;
+	} catch (const eval_error& err) {ostream << "evaluation error: " << err.what() << std::endl;}
 }
 
 void Console::pull() {
 	std::string cellstr1, cellstr2;
-	is >> cellstr1 >> cellstr2;
+	istream >> cellstr1 >> cellstr2;
 	try {
 		CellRefExpr start = CellRefExpr(cellstr1, &sh);
-		int sx = sh.getXCoord(start.getPtr());
-		int sy = sh.getYCoord(start.getPtr());
+		int startx = sh.getXCoord(start.getPtr());
+		int starty = sh.getYCoord(start.getPtr());
 		Range range(new CellRefExpr(cellstr1, &sh), new CellRefExpr(cellstr2, &sh));
 		for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
 			*cell = (*start.getPtr())->copy();
-			(*cell)->shift(sh.getXCoord(&*cell)-sx, sh.getYCoord(&*cell)-sy);
+			(*cell)->shift(sh.getXCoord(&*cell)-startx, sh.getYCoord(&*cell)-starty);
 		}
-	} catch (const syntax_error& err) {os << "syntax error: " << err.what() << std::endl;
-	} catch (const eval_error& err) {os << "evaluation error: " << err.what() << std::endl;}
+	} catch (const syntax_error& err) {ostream << "syntax error: " << err.what() << std::endl;
+	} catch (const eval_error& err) {ostream << "evaluation error: " << err.what() << std::endl;}
 }
 
 void Console::show() {
 	std::string cellstr;
-	is >> cellstr;
+	istream >> cellstr;
 	try	{
 		CellId cid(cellstr);
 		if (sh.checkRow(cid.getRow()) && sh.checkCol(cid.getColNum())){
-			os << sh[cid.getRow()-1][cid.getColNum()-1]->show() << " = ";
-			os << sh[cid.getRow()-1][cid.getColNum()-1].evalMe() << '\n';
+			ostream << sh[cid.getRow()-1][cid.getColNum()-1]->show() << " = ";
+			ostream << sh[cid.getRow()-1][cid.getColNum()-1].evalMe() << '\n';
 		} else {
-			os << "index out of range\n";
+			ostream << "index out of range\n";
 		}
-	} catch (const syntax_error& err) {os << "syntax error: " << err.what() << std::endl;
-	} catch (const eval_error& err) {os << "evaluation error: " << err.what() << std::endl;}
+	} catch (const syntax_error& err) {ostream << "syntax error: " << err.what() << std::endl;
+	} catch (const eval_error& err) {ostream << "evaluation error: " << err.what() << std::endl;}
 }
 
 void Console::readCommand(){
 	std::string command;
-	is >> command;
+	istream >> command;
 	if (command == "print") {
 		print();
 	} else if (command == "set") {
@@ -159,6 +160,6 @@ void Console::readCommand(){
 	} else if (command == "exit") {
 		exit();
 	} else {
-		os << "invalid command\n";
+		ostream << "invalid command\n";
 	}
 }
