@@ -3,10 +3,11 @@
 #include <sstream>
 
 #include "exceptions.hpp"
-#include "expression.hpp"
+#include "expressions/expression.hpp"
 #include "sheet.hpp"
 #include "parser.hpp"
 #include "console.hpp"
+
 
 TEST(Expression, Number){
 	NumberExpr n (3);

@@ -5,7 +5,7 @@
 #include <vector>
 #include <math.h>
 
-#include "expression_core.hpp"
+#include "expressions/expression_core.hpp"
 #include "exceptions.hpp"
 
 ///Számolótáblát reprezentáló osztály

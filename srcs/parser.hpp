@@ -6,9 +6,10 @@
 #include <iostream>
 
 #include "token.hpp"
-#include "expression.hpp"
+#include "expressions/expression.hpp"
 #include "sheet.hpp"
 #include "exceptions.hpp"
+
 
 ///Kifejezéseket értelmező osztály
 /**
@@ -60,7 +61,7 @@ class Parser {
 	Expression* primary(Sheet* shptr = nullptr);
 	CellRefExpr* cell(Sheet* shptr = nullptr);
 public:
-	Parser(std::string input); ///<konstruktor: a megadott stringet tokenlistává alakítja
+	explicit Parser(std::string input); ///<konstruktor: a megadott stringet tokenlistává alakítja
 	Parser& operator=(const Parser& p); ///<értékadó operátor
 	Parser(const Parser& p) {*this = p;} ///<másoló konstruktor
 

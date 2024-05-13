@@ -2,7 +2,8 @@ CXX = g++
 CXXFLAGS = -Werror -Wall -Wextra -Wpedantic -Wconversion -fsanitize=address
 GTTESTFLAGS = -lgtest -lgtest_main
 
-SRCS = srcs/token.cpp srcs/expression.cpp srcs/sheet.cpp srcs/parser.cpp srcs/console.cpp
+SRCS = srcs/token.cpp srcs/sheet.cpp srcs/parser.cpp srcs/console.cpp \
+srcs/expressions/cell.cpp srcs/expressions/range.cpp srcs/expressions/functions.cpp srcs/expressions/operators.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 SRCS1 = srcs/test.cpp
