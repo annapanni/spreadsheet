@@ -50,8 +50,6 @@ public:
 		ExprPointer* actRow; ///<aktuális sor kezdőcellájára mutató pointer
 		ExprPointer* actCell; ///<aktuális cellára mutató pointer
 	public:
-		iterator() : rangeWidth(0), tableWidth(0), actRow(nullptr), actCell(nullptr) {} ///<üres iterátor létrehozása
-
 		///konstruktor
 		/**
 		csak a tartománybeli sorok elejéről lehet indítani az iterátort
@@ -62,7 +60,7 @@ public:
 		iterator(size_t rw, size_t tw, ExprPointer* bp)
 			: rangeWidth(rw), tableWidth(tw), actRow(bp), actCell(bp) {}
 		///iterátor tartalmának kiolvasása, runtime_error-t dob ha üres iterátorból olvasunk
-		ExprPointer& operator*() const {if (actCell==nullptr) throw std::runtime_error("empty iterator"); return *actCell;}
+		ExprPointer& operator*() const {return *actCell;}
 		ExprPointer* operator->() const {return actCell;} ///<iterátor tartalmának tagjainak elérése
 		bool operator==(const ExprPointer* ep) const {return actCell == ep;} ///<egyenlőség ExprPointer*-el
 		bool operator==(const iterator& it) const {return actCell == it.actCell;} ///<egyenlőség egy másik iterátorral

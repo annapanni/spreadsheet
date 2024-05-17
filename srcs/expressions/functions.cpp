@@ -2,8 +2,7 @@
 
 //FunctionExpr fuctions ------------------------------------------------------
 void FunctionExpr::checkCyclic(std::vector<Expression*> prevs) const {
-	Range::iterator cell;
-	for (cell = range.begin(); cell != range.end(); cell++) {
+	for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
 		for (Expression* exprP : prevs) {
 			if (*cell ==  exprP) {
 				throw eval_error("cyclic reference");
@@ -29,8 +28,7 @@ FunctionExpr* FunctionExpr::newFunctionExpr(FunctionName fname, CellRefExpr* top
 double AvgFunc::eval() const {
 	size_t db = 0;
 	double sum = 0;
-	Range::iterator cell;
-	for (cell = range.begin(); cell != range.end(); cell++) {
+	for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
 		sum += (*cell)->eval();
 		db++;
 	}
@@ -39,8 +37,7 @@ double AvgFunc::eval() const {
 
 double SumFunc::eval() const {
 	double sum = 0;
-	Range::iterator cell;
-	for (cell = range.begin(); cell != range.end(); cell++) {
+	for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
 		sum += (*cell)->eval();
 	}
 	return sum;

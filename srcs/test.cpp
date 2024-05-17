@@ -13,28 +13,28 @@ TEST(Expression, Number){
 	NumberExpr n (3);
 	EXPECT_EQ(n.eval(), 3);
 	EXPECT_EQ(n.show(), "3");
-	Expression* nc = n.copy();
-	EXPECT_EQ(nc->eval(), 3);
-	EXPECT_NO_THROW(n.checkCyclic({nc}));
-	delete nc;
+	Expression* ncpy = n.copy();
+	EXPECT_EQ(ncpy->eval(), 3);
+	EXPECT_NO_THROW(n.checkCyclic({ncpy}));
+	delete ncpy;
 }
 TEST(Expression, CellRef){
 	CellRefExpr empty("sdf645");
 	EXPECT_EQ(empty.show(), "sdf645");
 	EXPECT_THROW(empty.eval(), eval_error);
 	Sheet sh(3, 3, 5);
-	CellRefExpr c (std::string("b3"), &sh);
-	EXPECT_EQ(c.eval(), 5);
-	EXPECT_EQ(c.show(), "b3");
-	EXPECT_EQ(c.getCol(), "b");
-	EXPECT_EQ(c.getRow(), 3);
-	EXPECT_EQ(c.getPtr(), &(sh[2][1]));
-	Expression* cc = c.copy();
-	EXPECT_EQ(cc->show(), "b3");
-	EXPECT_NO_THROW(c.checkCyclic({cc}));
-	EXPECT_THROW(c.checkCyclic({(Expression*)sh[2][1]}), eval_error);
-	EXPECT_THROW(cc->checkCyclic({(Expression*)sh[2][1]}), eval_error);
-	delete cc;
+	CellRefExpr cref (std::string("b3"), &sh);
+	EXPECT_EQ(cref.eval(), 5);
+	EXPECT_EQ(cref.show(), "b3");
+	EXPECT_EQ(cref.getCol(), "b");
+	EXPECT_EQ(cref.getRow(), 3);
+	EXPECT_EQ(cref.getPtr(), &(sh[2][1]));
+	Expression* crefcpy = cref.copy();
+	EXPECT_EQ(crefcpy->show(), "b3");
+	EXPECT_NO_THROW(cref.checkCyclic({crefcpy}));
+	EXPECT_THROW(cref.checkCyclic({(Expression*)sh[2][1]}), eval_error);
+	EXPECT_THROW(crefcpy->checkCyclic({(Expression*)sh[2][1]}), eval_error);
+	delete crefcpy;
 
 	CellRefExpr cell (std::string("b2"), &sh);
 	cell.shift(1,-1);
@@ -53,38 +53,38 @@ CellRefExpr* b3 = new CellRefExpr("b3", &sh);
 CellRefExpr* c2 = new CellRefExpr("c2", &sh);
 
 TEST (Expression, Range){
-	Range r1(a1->copy(), a1->copy());
+	Range range1(a1->copy(), a1->copy());
 
-	Range::iterator it = r1.begin();
+	Range::iterator it = range1.begin();
 	EXPECT_EQ(it++, a1->getPtr());
-	EXPECT_EQ(it++, r1.end());
+	EXPECT_EQ(it++, range1.end());
 
-	Range r2(a1->copy(), b3->copy());
-	EXPECT_EQ(r2.show(), "a1:b3");
-	it = r2.begin();
+	Range range2(a1->copy(), b3->copy());
+	EXPECT_EQ(range2.show(), "a1:b3");
+	it = range2.begin();
 
 	int db = 0;
-	while (it++ != r2.end()) {db++;}
+	while (it++ != range2.end()) {db++;}
 	EXPECT_EQ(db, 6);
 
-	Range r3(c2->copy(), a1->copy());
-	EXPECT_EQ(r3.show(), "a1:c2");
-	it = r3.begin();
+	Range range3(c2->copy(), a1->copy());
+	EXPECT_EQ(range3.show(), "a1:c2");
+	it = range3.begin();
 	db = 0;
-	while (it++ != r3.end()) {db++;}
+	while (it++ != range3.end()) {db++;}
 	EXPECT_EQ(db, 6);
 }
 
 TEST (Expression, Range2){
-	Range r4(b3->copy(), c2->copy());
-	EXPECT_EQ(r4.show(), "b2:c3");
-	Range::iterator it = r4.begin();
+	Range range4(b3->copy(), c2->copy());
+	EXPECT_EQ(range4.show(), "b2:c3");
+	Range::iterator it = range4.begin();
 	int db = 0;
-	while (it++ != r4.end()) {db++;}
+	while (it++ != range4.end()) {db++;}
 	EXPECT_EQ(db, 4);
 
-	r4.shift(-1, 0);
-	EXPECT_EQ(r4.show(), "a2:b3");
+	range4.shift(-1, 0);
+	EXPECT_EQ(range4.show(), "a2:b3");
 
 	CellRefExpr* a3 = a1->copy();
 	a3->shift(0, 2);
@@ -241,24 +241,24 @@ TEST (Sheet, functions){
 }
 
 TEST (Parser, constructorsAndTokens){
-	Parser p3("dd+(23-34/(-12))");
-	EXPECT_EQ(p3.show(), "string, plus, left br, number, minus, number, slash, left br, minus, number, right br, right br, ");
+	Parser parser3("dd+(23-34/(-12))");
+	EXPECT_EQ(parser3.show(), "string, plus, left br, number, minus, number, slash, left br, minus, number, right br, right br, ");
 	{
-		Parser p1("a+b+22*3");
-		Parser p2 = p1;
-		EXPECT_EQ(p1.show(), "string, plus, string, plus, number, star, number, ");
-		EXPECT_EQ(p2.show(), "string, plus, string, plus, number, star, number, ");
-		p3 = p2;
+		Parser parser1("a+b+22*3");
+		Parser parser2 = parser1;
+		EXPECT_EQ(parser1.show(), "string, plus, string, plus, number, star, number, ");
+		EXPECT_EQ(parser2.show(), "string, plus, string, plus, number, star, number, ");
+		parser3 = parser2;
 	}
-	EXPECT_EQ(p3.show(), "string, plus, string, plus, number, star, number, ");
-	Parser p("");
-	p.addToken(PLUS);
-	p.addToken("hali");
-	p.addToken(5.2);
-	p.addToken(STAR);
+	EXPECT_EQ(parser3.show(), "string, plus, string, plus, number, star, number, ");
+	Parser parser("");
+	parser.addToken(PLUS);
+	parser.addToken("hali");
+	parser.addToken(5.2);
+	parser.addToken(STAR);
 	std::string s = "45";
-	p.addTokenFromStr(s);
-	EXPECT_EQ(p.show(), "plus, string, number, star, number, ");
+	parser.addTokenFromStr(s);
+	EXPECT_EQ(parser.show(), "plus, string, number, star, number, ");
 }
 
 TEST (Parser, parsing){
