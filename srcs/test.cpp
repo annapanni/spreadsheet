@@ -18,6 +18,7 @@ TEST(Expression, Number){
 	EXPECT_NO_THROW(n.checkCyclic({ncpy}));
 	delete ncpy;
 }
+
 TEST(Expression, CellRef){
 	CellRefExpr empty("sdf645");
 	EXPECT_EQ(empty.show(), "sdf645");
@@ -54,7 +55,6 @@ CellRefExpr* c2 = new CellRefExpr("c2", &sh);
 
 TEST (Expression, Range){
 	Range range1(a1->copy(), a1->copy());
-
 	Range::iterator it = range1.begin();
 	EXPECT_EQ(it++, a1->getPtr());
 	EXPECT_EQ(it++, range1.end());

@@ -4,15 +4,15 @@
 Range::Range(CellRefExpr* top, CellRefExpr* bottom) {
 	std::string topCol = top->getCol();
 	std::string bottomCol = bottom->getCol();
-	int topRow = top->getRow();
-	int bottomRow = bottom->getRow();
+	unsigned int topRow = top->getRow();
+	unsigned int bottomRow = bottom->getRow();
 	std::string minCol = topCol <= bottomCol ? topCol : bottomCol;
 	bool minColAbs = topCol <= bottomCol ? top->getAbsCol() : bottom->getAbsCol();
 	std::string maxCol = topCol > bottomCol ? topCol : bottomCol;
 	bool maxColAbs = topCol > bottomCol ? top->getAbsCol() : bottom->getAbsCol();
-	int minRow = topRow <= bottomRow ? topRow : bottomRow;
+	unsigned int minRow = topRow <= bottomRow ? topRow : bottomRow;
 	bool minRowAbs = topRow <= bottomRow ? top->getAbsRow() : bottom->getAbsRow();
-	int maxRow = topRow > bottomRow ? topRow : bottomRow;
+	unsigned int maxRow = topRow > bottomRow ? topRow : bottomRow;
 	bool maxRowAbs = topRow > bottomRow ? top->getAbsRow() : bottom->getAbsRow();
 	topCell = new CellRefExpr(minCol, minRow, top->getSheet(), minColAbs, minRowAbs);
 	bottomCell = new CellRefExpr(maxCol, maxRow, top->getSheet(), maxColAbs, maxRowAbs); //assuming both cells are on the same sheet

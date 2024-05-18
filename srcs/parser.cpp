@@ -198,7 +198,7 @@ CellRefExpr* Parser::cell(Sheet* shptr){
 		if (match(DOLLAR)) {//col and row are separated, row is absolute
 			if (match(NUMBER)) {
 				try	{
-					int n = (int)dynamic_cast<DataToken<double>*>(prev())->getContent();
+					unsigned int n = (unsigned int)dynamic_cast<DataToken<double>*>(prev())->getContent();
 					return new CellRefExpr(colstr, n, shptr, absCol, true);
 				} catch (const std::bad_cast& bc) {throw std::runtime_error("tokenization error");}
 			} else {

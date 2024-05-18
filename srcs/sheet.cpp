@@ -32,23 +32,23 @@ Sheet& Sheet::operator=(const Sheet& sh){
 	return *this;
 }
 
-ExprPointer* Sheet::parseCell(int col, int row) const {
+ExprPointer* Sheet::parseCell(unsigned int col, unsigned int row) const {
 	if (checkRow(row) && checkCol(col)) {
 		return &(table[(row-1)*width + col -1]); //indexing from 0
 	}
 	throw eval_error("index out of range");
 }
 
-ExprPointer* Sheet::parseCell(std::string col, int row) const {
-	int colnum = colNumber(col);
+ExprPointer* Sheet::parseCell(std::string col, unsigned int row) const {
+	unsigned int colnum = colNumber(col);
 	return parseCell(colnum, row);
 }
 
-int Sheet::getYCoord(ExprPointer* cell) const {
-	return (int)(cell - table) / (int)width;
+unsigned int Sheet::getYCoord(ExprPointer* cell) const {
+	return (unsigned int)((cell - table) / width);
 }
-int Sheet::getXCoord(ExprPointer* cell) const {
-	return (int)(cell - getYCoord(cell)*(int)width - table);
+unsigned int Sheet::getXCoord(ExprPointer* cell) const {
+	return (unsigned int)(cell - getYCoord(cell) * width - table);
 }
 
 void Sheet::copyTo(Sheet& sh) const {
@@ -74,13 +74,13 @@ void Sheet::formattedPrint(std::ostream& os) const {
 		return;
 	}
 	os << std::setw((int)std::log10(height)+2) << std::setfill(' ') << ' ';
-	for (int col = 0; col < (int)width; col++) {
+	for (unsigned int col = 0; col < width; col++) {
 		os << colLetter(col+1) << "\t";
 	}
 	os << std::endl;
-	for (int row = 0; row < (int)height; row++) {
+	for (unsigned int row = 0; row < height; row++) {
 		os << std::setw((int)std::log10(height)+1) << row+1 << "|";
-		for (int col = 0; col < (int)width; col++) {
+		for (unsigned int col = 0; col < width; col++) {
 			try {
 				os << table[row*width + col].evalMe() << "\t";
 			} catch (const eval_error&){
@@ -92,8 +92,8 @@ void Sheet::formattedPrint(std::ostream& os) const {
 }
 
 void Sheet::printValues(std::ostream& os) const {
-	for (int row = 0; row < (int)height; row++) {
-		for (int col = 0; col < (int)width; col++) {
+	for (unsigned int row = 0; row < height; row++) {
+		for (unsigned int col = 0; col < width; col++) {
 			try {
 				os << table[row*width + col].evalMe() << ",";
 			} catch (const char* msg){
@@ -105,16 +105,16 @@ void Sheet::printValues(std::ostream& os) const {
 }
 
 void Sheet::printExpr(std::ostream& os) const {
-	for (int row = 0; row < (int)height; row++) {
-		for (int col = 0; col < (int)width; col++) {
+	for (unsigned int row = 0; row < height; row++) {
+		for (unsigned int col = 0; col < width; col++) {
 			os << table[row*width + col]->show() << ",";
 		}
 		os << std::endl;
 	}
 }
 
-int Sheet::colNumber(std::string str) {
-	int col = 0;
+unsigned int Sheet::colNumber(std::string str) {
+	unsigned int col = 0;
 	for (char c : str) {
 		if (!std::isalpha(c))
 			throw syntax_error("invalid column name");
@@ -123,7 +123,7 @@ int Sheet::colNumber(std::string str) {
 	return col;
 }
 
-std::string Sheet::colLetter(int n) {
+std::string Sheet::colLetter(unsigned int n) {
 	std::string col = "";
 	while (n > 0){
 		col.insert(0, 1, (char)(n%26 + 'a' - 1));

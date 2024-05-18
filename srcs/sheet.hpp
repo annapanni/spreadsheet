@@ -35,18 +35,18 @@ public:
 			return table + i*width;
 		throw std::out_of_range("");
 	} ///<adott sor lekérdezése 0-tól indexelve
-	ExprPointer* parseCell(int col, int row) const;
+	ExprPointer* parseCell(unsigned int col, unsigned int row) const;
 		///<tábla adott cellájára mutató pointer visszaadása oszlopszám és sorszám alapján
-	ExprPointer* parseCell(std::string col, int row) const;
+	ExprPointer* parseCell(std::string col, unsigned int row) const;
 		///<tábla adott cellájára mutató pointer visszaadása oszlopbetű és sorszám alapján
-	bool checkRow(int r) const {return r <= (int)height && r > 0;}
+	bool checkRow(unsigned int r) const {return r <= height && r > 0;}
 		///<ellenőrzi, hogy a táblázatban szerepel-e adott sorszámú sor (1-től indexelve)
-	bool checkCol(int col) const {return col <= (int)width && col > 0;}
+	bool checkCol(unsigned int col) const {return col <= width && col > 0;}
 		///<ellenőrzi, hogy a táblázatban szerepel-e adott sorszámú oszlop (1-től indexelve)
 
-	int getYCoord(ExprPointer* cell) const;
+	unsigned int getYCoord(ExprPointer* cell) const;
 		///<visszaadja, hogy egy adott cellára mutató pointer melyik sorban van (0-tól indexelve)
-	int getXCoord(ExprPointer* cell) const;
+	unsigned int getXCoord(ExprPointer* cell) const;
 		///<visszaadja, hogy egy adott cellára mutató pointer melyik oszlopban van (0-tól indexelve)
 	///átmásolja a tábla tartalmát egy másik, paraméterként kapott táblába
 	/**
@@ -70,8 +70,8 @@ public:
 
 	~Sheet(){delete[] table;} ///<felszabadítja a táblát
 
-	static int colNumber(std::string); ///<oszlopbetű oszlopszámra alakítása (1-től indexelve)
-	static std::string colLetter (int); ///<oszlopszám oszlopbetűre alakítása (1-től indexelve)
+	static unsigned int colNumber(std::string); ///<oszlopbetű oszlopszámra alakítása (1-től indexelve)
+	static std::string colLetter (unsigned int); ///<oszlopszám oszlopbetűre alakítása (1-től indexelve)
 };
 
 

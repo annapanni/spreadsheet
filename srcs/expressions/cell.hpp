@@ -12,16 +12,16 @@
 ///Cellát azonosító sor- és oszlopadat eltárolására szolgáló osztály.
 /** oszlop és sorindexeket is 1-től indexelve tárolja, paraméterként is így várja.*/
 class CellId {
-	int colNum; ///<oszlop sorszáma 1-től indexelve
-	int row; ///<sorszám 1-től indexelve
+	unsigned int colNum; ///<oszlop sorszáma 1-től indexelve
+	unsigned int row; ///<sorszám 1-től indexelve
 public:
-	CellId(std::string col, int row) : colNum(Sheet::colNumber(col)), row(row) {}
+	CellId(std::string col, unsigned int row) : colNum(Sheet::colNumber(col)), row(row) {}
 			///<konstruktor oszlopjelölő betű és sorszám megadásával
 	CellId(std::string); ///<konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel
-	int getColNum() const {return colNum;} ///<oszlopszám lekérdezése
-	int getRow() const {return row;} ///<sorszám lekérdezése
-	void setColNum(int c) {colNum = c;} ///<oszlopszám beállítása
-	void setRow(int r) {row = r;} ///<sorszám beállítása
+	unsigned int getColNum() const {return colNum;} ///<oszlopszám lekérdezése
+	unsigned int getRow() const {return row;} ///<sorszám lekérdezése
+	void setColNum(unsigned int c) {colNum = c;} ///<oszlopszám beállítása
+	void setRow(unsigned int r) {row = r;} ///<sorszám beállítása
 	std::string colLetter() const {return Sheet::colLetter(colNum);} ///<oszlopbetű lekérdezése
 };
 
@@ -42,7 +42,7 @@ public:
 	@param absCol - abszolút hivatkozás-e az oszlop
 	@param absRow - abszolút hivatkozás-e a sor
 	 */
-	CellRefExpr(std::string col, int row, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
+	CellRefExpr(std::string col, unsigned int row, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
 		: cell(CellId(col, row)), refSheet(refSheet), absCol(absCol), absRow(absRow) {}
 
 	///konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel
@@ -55,7 +55,7 @@ public:
 	CellRefExpr(std::string str, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
 		: cell(CellId(str)), refSheet(refSheet), absCol(absCol), absRow(absRow) {}
 	std::string getCol() const {return cell.colLetter();} ///<oszlopbetű lekérdezése
-	int getRow() const {return cell.getRow();} ///<sorszám lekérdezése
+	unsigned int getRow() const {return cell.getRow();} ///<sorszám lekérdezése
 	Sheet* getSheet() const {return refSheet;} ///<hivatkozás által mutatott tábla lekérdezése
 
 	///hivatkozás által mutatott cellára mutató pointer lekérdezése

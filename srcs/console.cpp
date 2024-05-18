@@ -56,7 +56,7 @@ void Console::save() {
 void Console::load() {
 	std::ifstream ifile;
 	std::string fname;
-	int w = 0, h = 0;
+	unsigned int w = 0, h = 0;
 	istream >> fname;
 	try	{ifile.open(fname + ".csv");}
 	catch (...) {ostream << "Load failed\n"; return;}
@@ -71,9 +71,9 @@ void Console::load() {
 	try	{ifile.open(fname + ".csv");}
 	catch (...) {ostream << "Load failed\n"; return;}
 	Sheet newsh(w, h, 0);
-	int row = 0;
+	unsigned int row = 0;
 	while (getline(ifile, line) && row < h) {
-		int col = 0;
+		unsigned int col = 0;
 		std::stringstream linestream(line);
 		while (getline(linestream, word, ',') && col < w) {
 			try {Parser(word).parseTo(&newsh, newsh[row][col]);}
@@ -108,8 +108,8 @@ void Console::pull() {
 	istream >> cellstr1 >> cellstr2;
 	try {
 		CellRefExpr start = CellRefExpr(cellstr1, &sh);
-		int startx = sh.getXCoord(start.getPtr());
-		int starty = sh.getYCoord(start.getPtr());
+		unsigned int startx = sh.getXCoord(start.getPtr());
+		unsigned int starty = sh.getYCoord(start.getPtr());
 		Range range(new CellRefExpr(cellstr1, &sh), new CellRefExpr(cellstr2, &sh));
 		for (Range::iterator cell = range.begin(); cell != range.end(); cell++) {
 			*cell = (*start.getPtr())->copy();
