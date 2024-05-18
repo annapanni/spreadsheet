@@ -41,24 +41,24 @@ de az eredeti funkciójukat is megtartja. Így minden kifejezést gyakorlatilag 
 osztálypéldányként tudunk kezelni (pointer helyett).
 */
 class ExprPointer {
-	Expression* ep; ///<az osztály által becsomagolt pointer
+	Expression* content; ///<az osztály által becsomagolt pointer
 public:
-	ExprPointer(Expression* p = nullptr) : ep(p) {} ///<konstruktor pointer inicializálásával
-	ExprPointer(const ExprPointer& rhs) : ep(rhs.ep->copy()) {} ///<másoló konstruktor
-	operator Expression*() const {return ep;} ///<castolás Expression*-ra
+	ExprPointer(Expression* p = nullptr) : content(p) {} ///<konstruktor pointer inicializálásával
+	ExprPointer(const ExprPointer& rhs) : content(rhs.content->copy()) {} ///<másoló konstruktor
+	operator Expression*() const {return content;} ///<castolás Expression*-ra
 	ExprPointer& operator=(const ExprPointer& rhs) {
 		if (&rhs != this) {
-			delete ep;
-			ep = rhs.ep->copy();
+			delete content;
+			content = rhs.content->copy();
 		}
 		return *this;
 	} ///<értékadás a másik kifejezés rekurzív másolásával
-	bool operator==(const ExprPointer& rhs) const {return ep == rhs.ep;} ///<egyenlőség másik ExprPointer-el
-	bool operator==(Expression* p) {return ep == p;} ///<egyenlőség Expression*-al
-	Expression* operator->() const {return ep;} ///<becsomagolt pointer adatainak és függvényeinek elérése nyíllal
-	double evalMe() {return ep->safeEval({ep});}
+	bool operator==(const ExprPointer& rhs) const {return content == rhs.content;} ///<egyenlőség másik ExprPointer-el
+	bool operator==(Expression* p) {return content == p;} ///<egyenlőség Expression*-al
+	Expression* operator->() const {return content;} ///<becsomagolt pointer adatainak és függvényeinek elérése nyíllal
+	double evalMe() {return content->safeEval({content});}
 		///<kiértékeli az adott kifejezést úgy, hogy, a körkörös hivatkozások keresése tőle indul
-	~ExprPointer() {delete ep;} ///<felszabadítja a pointert
+	~ExprPointer() {delete content;} ///<felszabadítja a pointert
 };
 
 ///Valós számokat tároló kifejezés osztály
