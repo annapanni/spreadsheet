@@ -16,12 +16,12 @@ public:
 	virtual double eval() const = 0;
 	///ellenőrzi, tartalmaz-e a kifejezés ciklikus referenciát
 	/**amennyiben igen, eval_error kivételt dob
-	@param ps - a kifejezésben korábban hivatkozott cellák, amire ismét hivatkozva körkörös hivatkozást kapunk
+	@param prevs - a kifejezésben korábban hivatkozott cellák, amire ismét hivatkozva körkörös hivatkozást kapunk
 	*/
 	virtual void checkCyclic(std::vector<Expression*>) const = 0;
 	///rekurzívan kiértékeli a kifejezést, körkörös hivatkozásra is eval_error hibát dob
   /**
-	@param ps - a kifejezésben korábban hivatkozott cellák, amire ismét hivatkozva körkörös hivatkozást kapunk
+	@param prevs - a kifejezésben korábban hivatkozott cellák, amire ismét hivatkozva körkörös hivatkozást kapunk
 	*/
 	double safeEval(std::vector<Expression*> prevs) const {checkCyclic(prevs); return eval();}
 	virtual std::string show() const = 0; ///<kifejezés megjelenítése std::string-ként

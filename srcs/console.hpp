@@ -34,26 +34,28 @@ public:
 	bool isClosed() const {return closed;} ///<visszaadja, bezárták-e a konzolt
 	void help(); ///<kiírja az ostream-re az elérhető parancsokat
 
-	///új táblát hoz létre (ha volt előző, azt eldobja)
-	/**paramétereit az istream-ről olvassa: új tábla szélesség és magassága*/
-	void createNew();
-	///átméretezi a táblát, ha kisebb lesz, a fennmaradó adat elveszik
-	/**paramétereit az istream-ről olvassa: tábla új szélesség és magassága*/
-	void resize();
-	void print() {sh.formattedPrint(ostream);} ///<kiírja az ostream-re a tábla tartalmát oszlop- és sorszámokkal
-	void exportValues(); ///<istream-ről bekért fájlnevű fájlba kiírja a táblában tárolt értékeket vesszővel elválasztva
-	void save(); ///<istream-ről bekért fájlnevű fájlba kiírja a táblában tárolt kifejezéseket vesszővel elválasztva
-	void load(); ///<istream-ről bekért fájlnevű fájlból beolvassa a vesszővel elválasztott kifejezéseket
-	void set(); ///<istream-ről bekért cellába beállítja a megadott kifejezést (amennyiben szintaktikailag helyes)
-	///automatikusan kitölti a kezdőcellában található értékkel a cellákat a második paraméterben kapott celláig egy téglalapban
-	/**
-	a kezdőcellában található kifejezést átmásolja a két cella által meghatározott
-	téglalap minden cellájába, ezen felül minden nem abszolút hivatkozást eltol a kezdőcellától
-	vett relatív pozíciójának megfelelően (ld. CellRefExpr::shift)
-	*/
-	void pull();
-	void show(); ///<kiírja az ostream-re a istream-ről olvasott cella tartalmát és értékét
-	void exit() {closed = true;} ///<bezárja a konzolt
+	//*** Az alábbi parancsok a tesztelés megkönnyítésének érdekében publikusak, lehetnének privátak
+			///új táblát hoz létre (ha volt előző, azt eldobja)
+			/**paramétereit az istream-ről olvassa: új tábla szélesség és magassága*/
+			void createNew();
+			///átméretezi a táblát, ha kisebb lesz, a fennmaradó adat elveszik
+			/**paramétereit az istream-ről olvassa: tábla új szélesség és magassága*/
+			void resize();
+			void print() {sh.formattedPrint(ostream);} ///<kiírja az ostream-re a tábla tartalmát oszlop- és sorszámokkal
+			void exportValues(); ///<istream-ről bekért fájlnevű fájlba kiírja a táblában tárolt értékeket vesszővel elválasztva
+			void save(); ///<istream-ről bekért fájlnevű fájlba kiírja a táblában tárolt kifejezéseket vesszővel elválasztva
+			void load(); ///<istream-ről bekért fájlnevű fájlból beolvassa a vesszővel elválasztott kifejezéseket
+			void set(); ///<istream-ről bekért cellába beállítja a megadott kifejezést (amennyiben szintaktikailag helyes)
+			///automatikusan kitölti a kezdőcellában található értékkel a cellákat a második paraméterben kapott celláig egy téglalapban
+			/**
+			a kezdőcellában található kifejezést átmásolja a két cella által meghatározott
+			téglalap minden cellájába, ezen felül minden nem abszolút hivatkozást eltol a kezdőcellától
+			vett relatív pozíciójának megfelelően (ld. CellRefExpr::shift)
+			*/
+			void pull();
+			void show(); ///<kiírja az ostream-re a istream-ről olvasott cella tartalmát és értékét
+			void exit() {closed = true;} ///<bezárja a konzolt
+	// A fenti parancsok a tesztelés megkönnyítésének érdekében publikusak, lehetnének privátak
 
 	///beolvassa és értelmezi az istream-re beírt parancs nevét, és meghívja a megfelelő tagfüggvényt
 	/**ha helytelen parancsnevet kap, hibaüzenetet ír az ostream-re*/

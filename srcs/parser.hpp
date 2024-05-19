@@ -45,14 +45,14 @@ class Parser {
 	Token* prev() const {return tokens[current-1];} ///visszaadja az előző tokent
 	bool check(Token_type tt) const {return !atEnd() && tokens[current]->getType()==tt;}
 		///<ellenőrzi a jelenlegi token egy adott típusú-e
-	bool match(Token_type tt);
+	bool match(Token_type ttype);
 		///<ellenőrzi a jelenlegi token egy adott típusú-e, ha igen, akkor tovább lépteti a feldolgozást
 	///megpróbálja "elfogyasztani" a jelenlegi tokent ha az az adott típusú
 	/**
-	@param tt - elfogyasztani kívánt tokentípus
+	@param ttype - elfogyasztani kívánt tokentípus
 	@param msg - ha a jelenlegi token nem az adott típusú ez az üzenet kerül a syntax_error belsejébe
 	*/
-	Token* consume(Token_type tt, const char* msg);
+	Token* consume(Token_type ttype, const char* msg);
 
 	Expression* expression(Sheet* shptr = nullptr);
 	Expression* factor(Sheet* shptr = nullptr);

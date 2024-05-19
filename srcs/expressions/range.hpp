@@ -53,13 +53,13 @@ public:
 		///konstruktor
 		/**
 		csak a tartománybeli sorok elejéről lehet indítani az iterátort
-		@param rw - a bejárandó tartomány szélessége
-		@param tw - a bejárandó tartományt taralmazó tábla szélessége
-		@param bp - a cella, melyre az iterátor kezdetben mutat
+		@param rangeWidth - a bejárandó tartomány szélessége
+		@param tableWidth - a bejárandó tartományt taralmazó tábla szélessége
+		@param beginPtr - a cella, melyre az iterátor kezdetben mutat
 		*/
-		iterator(size_t rw, size_t tw, ExprPointer* bp)
-			: rangeWidth(rw), tableWidth(tw), actRow(bp), actCell(bp) {}
-		///iterátor tartalmának kiolvasása, runtime_error-t dob ha üres iterátorból olvasunk
+		iterator(size_t rangeWidth, size_t tableWidth, ExprPointer* beginPtr)
+			: rangeWidth(rangeWidth), tableWidth(tableWidth), actRow(beginPtr), actCell(beginPtr) {}
+		///iterátor tartalmának kiolvasása
 		ExprPointer& operator*() const {return *actCell;}
 		ExprPointer* operator->() const {return actCell;} ///<iterátor tartalmának tagjainak elérése
 		bool operator==(const ExprPointer* ep) const {return actCell == ep;} ///<egyenlőség ExprPointer*-el
