@@ -19,8 +19,8 @@ class FunctionExpr : public Expression {
 protected:
 	Range range; ///<tartomány, melyen a függvény végrehajtódik
 public:
-	FunctionExpr(Range r) : range(r) {} ///<konstruktor
-	FunctionExpr(CellRefExpr* topCell, CellRefExpr* bottomCell) : range(topCell, bottomCell) {} ///<konstruktor
+	explicit FunctionExpr(Range r) : range(r) {} ///<konstruktor
+	explicit FunctionExpr(CellRefExpr* topCell, CellRefExpr* bottomCell) : range(topCell, bottomCell) {} ///<konstruktor
 	void checkCyclic(std::vector<Expression*>) const;
 	void shift(int dx, int dy) {range.shift(dx, dy);}
 	void relocate(Sheet* shp) {range.relocate(shp);}
@@ -38,8 +38,8 @@ public:
 ///Tartomány átlagát vevő függvény osztály
 class AvgFunc : public FunctionExpr {
 public:
-	AvgFunc(Range r) : FunctionExpr(r) {}
-	AvgFunc(CellRefExpr* topCell, CellRefExpr* bottomCell) : FunctionExpr(topCell, bottomCell) {}
+	explicit AvgFunc(Range r) : FunctionExpr(r) {}
+	explicit AvgFunc(CellRefExpr* topCell, CellRefExpr* bottomCell) : FunctionExpr(topCell, bottomCell) {}
 	double eval() const;
 	std::string show() const {return "avg(" + range.show() + ")";}
 	Expression* copy() const {return new AvgFunc(range);}
@@ -48,8 +48,8 @@ public:
 ///Tartományt összegző függvény osztály
 class SumFunc : public FunctionExpr {
 public:
-	SumFunc(Range r) : FunctionExpr(r) {}
-	SumFunc(CellRefExpr* topCell, CellRefExpr* bottomCell) : FunctionExpr(topCell, bottomCell) {}
+	explicit SumFunc(Range r) : FunctionExpr(r) {}
+	explicit SumFunc(CellRefExpr* topCell, CellRefExpr* bottomCell) : FunctionExpr(topCell, bottomCell) {}
 	double eval() const;
 	std::string show() const {return "sum(" + range.show() + ")";}
 	Expression* copy() const {return new SumFunc(range);}

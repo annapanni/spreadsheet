@@ -65,7 +65,7 @@ public:
 class NumberExpr : public Expression {
 	double value; ///<kifejezés értéke
 public:
-	NumberExpr(double v) : value(v) {} ///<konstruktor
+	explicit NumberExpr(double v) : value(v) {} ///<konstruktor
 	double eval() const {return value;} ///<kifejezés kiértékelése - érték visszaadása
 	void checkCyclic(std::vector<Expression*>) const {}
 	Expression* copy() const {return new NumberExpr(value);}

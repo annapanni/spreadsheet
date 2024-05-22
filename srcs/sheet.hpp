@@ -18,7 +18,7 @@ class Sheet {
 	size_t width; ///<tábla szélessége
 	size_t height; ///<tábla magassága
 public:
-	Sheet() : table(nullptr), width(0), height(0) {} ///<konstruktor
+	explicit Sheet() : table(nullptr), width(0), height(0) {} ///<konstruktor
 	Sheet(const Sheet&); ///<másoló konstruktor
 	///konstruktor adott számmal inicializálással
 	/**
@@ -26,7 +26,7 @@ public:
 	@param height - létrehozandó tábla magassága
 	@param fill - a létrejövő tábla minden celláját ezzel a számmal inicializálja
 	*/
-	Sheet(size_t width, size_t height, double fill = 0);
+	explicit Sheet(size_t width, size_t height, double fill = 0);
 	size_t getWidth() const {return width;} ///<tábla szélességének lekérdezése
 	size_t getHeight() const {return height;}  ///<tábla magasságának lekérdezése
 	Sheet& operator=(const Sheet&); ///<értékadó operátor

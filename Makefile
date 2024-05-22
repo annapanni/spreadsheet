@@ -19,9 +19,6 @@ test: $(OBJS1)
 console: $(OBJS2)
 	$(CXX) $(CXXFLAGS) $^ -o $@
 
-#$(TARGET) : $(OBJS)
-#	$(CXX) $(CXXFLAGS) $^ -o $@
-
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 

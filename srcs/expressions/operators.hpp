@@ -21,7 +21,7 @@ public:
 	@param lhs - bal oldali operandus
 	@param rhs - jobb oldali operandus
 	*/
-	Operator(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
+	explicit Operator(Expression* lhs, Expression* rhs) : lhs(lhs), rhs(rhs) {}
 	Operator(const Operator& op) : lhs(op.lhs->copy()), rhs(op.rhs->copy()) {} ///<másoló konstruktor
 	Operator& operator=(const Operator& op); ///<értékadás operátor
 	void checkCyclic(std::vector<Expression*> prevs) const {lhs->checkCyclic(prevs); rhs->checkCyclic(prevs);}
@@ -39,7 +39,7 @@ public:
 ///Szorzás műveletet reprezentáló osztály
 class Mult : public Operator {
 public:
-	Mult(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
+	explicit Mult(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() const {return lhs->eval() * rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "*" + rhs->show() + ")";}
 	Expression* copy() const {return new Mult(lhs->copy(), rhs->copy());}
@@ -48,7 +48,7 @@ public:
 ///Osztás műveletet reprezentáló osztály
 class Div : public Operator {
 public:
-	Div(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
+	explicit Div(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() const {return lhs->eval() / rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "/" + rhs->show() + ")";}
 	Expression* copy() const {return new Div(lhs->copy(), rhs->copy());}
@@ -57,7 +57,7 @@ public:
 ///Összeadás műveletet reprezentáló osztály
 class Add : public Operator {
 public:
-	Add(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
+	explicit Add(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() const {return lhs->eval() + rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "+" + rhs->show() + ")";}
 	Expression* copy() const {return new Add(lhs->copy(), rhs->copy());}
@@ -66,7 +66,7 @@ public:
 ///Kivonás műveletet reprezentáló osztály
 class Sub : public Operator {
 public:
-	Sub(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
+	explicit Sub(Expression* lhs, Expression* rhs) : Operator(lhs, rhs) {}
 	double eval() const {return lhs->eval() - rhs->eval();}
 	std::string show() const {return "(" + lhs->show() + "-" + rhs->show() + ")";}
 	Expression* copy() const {return new Sub(lhs->copy(), rhs->copy());}

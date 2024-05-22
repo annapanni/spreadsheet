@@ -25,7 +25,7 @@ public:
 	Ezért a konstruktor új referenciákat készít és ezeket tárolja el végül és bejárni
 	is a bal felső cellából kezdi így a bejárást.
 	*/
-	Range(CellRefExpr* top, CellRefExpr* bottom);
+	explicit Range(CellRefExpr* top, CellRefExpr* bottom);
 	///másoló konstruktor
 	Range(const Range& r) : topCell(r.topCell->copy()), bottomCell(r.bottomCell->copy()) {}
 	Range& operator=(const Range& r); ///<értékadás operátor

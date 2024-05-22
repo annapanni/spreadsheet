@@ -24,11 +24,11 @@ class Console {
 	std::istream& istream; ///<a parancsok nevét és paramétereit innen olvassa a konzol
 	bool closed = false; ///<bezárták-e a konzolt
 public:
-	Console() : ostream(std::cout), istream(std::cin) {}
+	explicit Console() : ostream(std::cout), istream(std::cin) {}
 		///<alapértelmezett konstruktor, input és outputstream-je a std::cin és std::cout
-	Console(const Sheet& sh, std::ostream& ostream, std::istream& istream) : sh(sh), ostream(ostream), istream(istream) {}
+	explicit Console(const Sheet& sh, std::ostream& ostream, std::istream& istream) : sh(sh), ostream(ostream), istream(istream) {}
 		///<konstruktor tábla, input- és outputstreamek megadásával
-	Console(std::ostream& ostream, std::istream& istream) : ostream(ostream), istream(istream) {}
+	explicit Console(std::ostream& ostream, std::istream& istream) : ostream(ostream), istream(istream) {}
 		///<konstruktor csak input- és outputstreamek megadásával
 
 	bool isClosed() const {return closed;} ///<visszaadja, bezárták-e a konzolt
