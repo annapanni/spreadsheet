@@ -39,7 +39,7 @@ ExprPointer* Sheet::parseCell(unsigned int col, unsigned int row) const {
 	throw eval_error("index out of range");
 }
 
-ExprPointer* Sheet::parseCell(std::string col, unsigned int row) const {
+ExprPointer* Sheet::parseCell(const std::string& col, unsigned int row) const {
 	unsigned int colnum = colNumber(col);
 	return parseCell(colnum, row);
 }

@@ -61,12 +61,12 @@ class Parser {
 	Expression* primary(Sheet* shptr = nullptr);
 	CellRefExpr* cell(Sheet* shptr = nullptr);
 public:
-	explicit Parser(std::string input); ///<konstruktor: a megadott stringet tokenlistává alakítja
+	explicit Parser(const std::string& input); ///<konstruktor: a megadott stringet tokenlistává alakítja
 	Parser& operator=(const Parser& p); ///<értékadó operátor
 	Parser(const Parser& p) {*this = p;} ///<másoló konstruktor
 
 	void addToken(Token_type t); ///<hozzáad a tokenek listájához egy megadott típusú tokent
-	void addToken(std::string s);
+	void addToken(const std::string& s);
 		///<hozzáad a tokenek listájához egy STRING típusú adattokent a paraméterként megadott stringgel mint belső adat
 	void addToken(double n);
 		///<hozzáad a tokenek listájához egy NUMBER típusú adattokent a paraméterként megadott számmal mint belső adat

@@ -15,9 +15,9 @@ class CellId {
 	unsigned int colNum; ///<oszlop sorszáma 1-től indexelve
 	unsigned int row; ///<sorszám 1-től indexelve
 public:
-	explicit CellId(std::string col, unsigned int row) : colNum(Sheet::colNumber(col)), row(row) {}
+	explicit CellId(const std::string& col, unsigned int row) : colNum(Sheet::colNumber(col)), row(row) {}
 			///<konstruktor oszlopjelölő betű és sorszám megadásával
-	explicit CellId(std::string); ///<konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel
+	explicit CellId(const std::string&); ///<konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel
 	unsigned int getColNum() const {return colNum;} ///<oszlopszám lekérdezése
 	unsigned int getRow() const {return row;} ///<sorszám lekérdezése
 	void setColNum(unsigned int c) {colNum = c;} ///<oszlopszám beállítása
@@ -42,7 +42,7 @@ public:
 	@param absCol - abszolút hivatkozás-e az oszlop
 	@param absRow - abszolút hivatkozás-e a sor
 	 */
-	explicit CellRefExpr(std::string col, unsigned int row, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
+	explicit CellRefExpr(const std::string& col, unsigned int row, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
 		: cell(CellId(col, row)), refSheet(refSheet), absCol(absCol), absRow(absRow) {}
 
 	///konstruktor "[oszlopbetű][sorszám]" formátumú bemenettel
@@ -52,7 +52,7 @@ public:
 	@param absCol - abszolút hivatkozás-e az oszlop
 	@param absRow - abszolút hivatkozás-e a sor
 	 */
-	explicit CellRefExpr(std::string str, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
+	explicit CellRefExpr(const std::string& str, Sheet* refSheet = nullptr, bool absCol=false, bool absRow=false)
 		: cell(CellId(str)), refSheet(refSheet), absCol(absCol), absRow(absRow) {}
 	std::string getCol() const {return cell.colLetter();} ///<oszlopbetű lekérdezése
 	unsigned int getRow() const {return cell.getRow();} ///<sorszám lekérdezése

@@ -1,7 +1,7 @@
 #include "cell.hpp"
 
 //CellId fuctions --------------------------------------------------------------
-CellId::CellId(std::string cellstr){
+CellId::CellId(const std::string& cellstr){
 	try	{
 		size_t i;
 		for (i = 0; i < cellstr.size() && !std::isdigit(cellstr[i]); i++) {}

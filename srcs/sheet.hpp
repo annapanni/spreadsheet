@@ -37,7 +37,7 @@ public:
 	} ///<adott sor lekérdezése 0-tól indexelve
 	ExprPointer* parseCell(unsigned int col, unsigned int row) const;
 		///<tábla adott cellájára mutató pointer visszaadása oszlopszám és sorszám alapján
-	ExprPointer* parseCell(std::string col, unsigned int row) const;
+	ExprPointer* parseCell(const std::string& col, unsigned int row) const;
 		///<tábla adott cellájára mutató pointer visszaadása oszlopbetű és sorszám alapján
 	bool checkRow(unsigned int r) const {return r <= height && r > 0;}
 		///<ellenőrzi, hogy a táblázatban szerepel-e adott sorszámú sor (1-től indexelve)

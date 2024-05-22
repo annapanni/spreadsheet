@@ -4,9 +4,11 @@
 void Parser::addToken(Token_type type){
 	tokens.push_back(new Token(type));
 }
-void Parser::addToken(std::string s){
+
+void Parser::addToken(const std::string& s){
 	tokens.push_back(new DataToken<std::string>(STRING, s));
 }
+
 void Parser::addToken(double num){
 	tokens.push_back(new DataToken<double>(NUMBER, num));
 }
@@ -28,9 +30,9 @@ void Parser::addTokenFromStr(std::string& str_buffer){
 	}
 }
 
-Parser::Parser(std::string input){
+Parser::Parser(const std::string& input){
 	std::string str_buffer = "";
-	for (char& c : input) {
+	for (const char& c : input) {
 		if (std::isspace(c))
 			continue;
 		Token_type type = Token::parseTokenType(c);

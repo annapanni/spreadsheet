@@ -26,7 +26,7 @@ public:
 	void relocate(Sheet* shp) {range.relocate(shp);}
 	virtual ~FunctionExpr(){}
 	///értelmezi a függvények neveit (case sensitive)
-	static std::optional<FunctionName> parseFname(std::string name){
+	static std::optional<FunctionName> parseFname(const std::string& name){
 		if (name == "avg") return AVG;
 		if (name == "sum") return SUM;
 		return {};
