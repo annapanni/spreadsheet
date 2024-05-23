@@ -43,7 +43,7 @@ class Parser {
 
 	bool atEnd() const {return current >= tokens.size();} ///<ellenőrzi, hogy a feldolgozás végén járunk-e
 	Token* prev() const {return tokens[current-1];} ///visszaadja az előző tokent
-	bool check(Token_type tt) const {return !atEnd() && tokens[current]->getType()==tt;}
+	bool check(Token_type ttype) const {return !atEnd() && tokens[current]->getType()==ttype;}
 		///<ellenőrzi a jelenlegi token egy adott típusú-e
 	bool match(Token_type ttype);
 		///<ellenőrzi a jelenlegi token egy adott típusú-e, ha igen, akkor tovább lépteti a feldolgozást

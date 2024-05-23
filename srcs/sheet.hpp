@@ -70,7 +70,7 @@ public:
 
 	~Sheet(){delete[] table;} ///<felszabadítja a táblát
 
-	static unsigned int colNumber(std::string); ///<oszlopbetű oszlopszámra alakítása (1-től indexelve)
+	static unsigned int colNumber(const std::string&); ///<oszlopbetű oszlopszámra alakítása (1-től indexelve)
 	static std::string colLetter (unsigned int); ///<oszlopszám oszlopbetűre alakítása (1-től indexelve)
 };
 

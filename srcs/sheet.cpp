@@ -113,7 +113,7 @@ void Sheet::printExpr(std::ostream& os) const {
 	}
 }
 
-unsigned int Sheet::colNumber(std::string str) {
+unsigned int Sheet::colNumber(const std::string& str) {
 	unsigned int col = 0;
 	for (char c : str) {
 		if (!std::isalpha(c))
