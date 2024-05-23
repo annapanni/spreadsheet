@@ -6,7 +6,6 @@
 
 #include "expression_core.hpp"
 #include "cell.hpp"
-#include "../exceptions.hpp"
 
 ///Cellahivatkozások egy téglalap alakú tartományát reprezentáló osztály
 /**A téglalapot a bal felső és jobb alsó cellája határozza meg, és elvárás, hogy

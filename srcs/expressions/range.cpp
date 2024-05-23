@@ -1,4 +1,6 @@
 #include "range.hpp"
+#include "../exceptions.hpp"
+
 
 //Range fuctions ---------------------------------------------------------------
 Range::Range(CellRefExpr* top, CellRefExpr* bottom) {

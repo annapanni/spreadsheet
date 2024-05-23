@@ -1,4 +1,5 @@
 #include "cell.hpp"
+#include "../exceptions.hpp"
 
 //CellId fuctions --------------------------------------------------------------
 CellId::CellId(const std::string& cellstr){

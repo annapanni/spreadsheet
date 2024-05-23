@@ -7,7 +7,6 @@
 
 #include "expression_core.hpp"
 #include "range.hpp"
-#include "../exceptions.hpp"
 
 ///elérhető függvények nevei
 enum FunctionName {

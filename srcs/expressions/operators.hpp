@@ -6,7 +6,6 @@
 
 #include "expression_core.hpp"
 #include "../sheet.hpp"
-#include "../exceptions.hpp"
 #include "../token.hpp"
 
 

@@ -2,11 +2,8 @@
 #define CONSOLE_HPP
 
 #include <iostream>
-#include <fstream>
 #include <string>
-#include "parser.hpp"
 #include "sheet.hpp"
-#include "exceptions.hpp"
 
 ///Felhasználói felület biztosítására szolgáló osztály
 /**

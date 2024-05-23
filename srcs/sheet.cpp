@@ -1,4 +1,6 @@
 #include "sheet.hpp"
+#include "exceptions.hpp"
+
 
 #include <cctype>
 #include <iomanip>

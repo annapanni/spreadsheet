@@ -1,5 +1,7 @@
 #include <cctype>
 #include "parser.hpp"
+#include "exceptions.hpp"
+
 
 void Parser::addToken(Token_type type){
 	tokens.push_back(new Token(type));

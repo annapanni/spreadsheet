@@ -1,4 +1,6 @@
 #include "operators.hpp"
+#include "../exceptions.hpp"
+
 
 Operator& Operator::operator=(const Operator& op){
 	if (&op != this) {

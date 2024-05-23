@@ -1,4 +1,9 @@
+#include <fstream>
+
 #include "console.hpp"
+#include "parser.hpp"
+#include "exceptions.hpp"
+
 
 void Console::help(){
 	ostream << "Available commands: \n\
@@ -143,7 +148,7 @@ void Console::readCommand(){
 		set();
 	} else if (command == "show") {
 		show();
-	}  else if (command == "pull") {
+	} else if (command == "pull") {
 		pull();
 	} else if (command == "new") {
 		createNew();

@@ -8,7 +8,6 @@
 #include "token.hpp"
 #include "expressions/expression.hpp"
 #include "sheet.hpp"
-#include "exceptions.hpp"
 
 
 ///Kifejezéseket értelmező osztály

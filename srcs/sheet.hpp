@@ -6,7 +6,6 @@
 #include <math.h>
 
 #include "expressions/expression_core.hpp"
-#include "exceptions.hpp"
 
 ///Számolótáblát reprezentáló osztály
 /**

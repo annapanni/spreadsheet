@@ -1,4 +1,5 @@
 #include "functions.hpp"
+#include "../exceptions.hpp"
 
 //FunctionExpr fuctions ------------------------------------------------------
 void FunctionExpr::checkCyclic(std::vector<Expression*> prevs) const {
